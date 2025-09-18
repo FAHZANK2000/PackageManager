@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.utils.SerializableItems.ActivityItems;
@@ -62,9 +62,9 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Vi
         }
         holder.mName.setText(data.get(position).getName());
         holder.mIcon.setImageDrawable(data.get(position).getIcon());
-        holder.mOpen.setVisibility(data.get(position).exported() ? VISIBLE : GONE);
+        holder.mLaunchLayout.setVisibility(data.get(position).exported() ? VISIBLE : GONE);
 
-        holder.mOpen.setOnClickListener(v -> {
+        holder.mLaunchLayout.setOnClickListener(v -> {
             PackageManager pm = v.getContext().getPackageManager();
             ComponentName component = new ComponentName(packageName, data.get(position).getName());
 
@@ -89,15 +89,15 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final AppCompatImageButton mIcon;
-        private final MaterialButton mOpen;
+        private final LinearLayoutCompat mLaunchLayout;
         private final MaterialTextView mLabel, mName;
 
         public ViewHolder(View view) {
             super(view);
             this.mLabel = view.findViewById(R.id.title);
             this.mName = view.findViewById(R.id.description);
+            this.mLaunchLayout = view.findViewById(R.id.launch_layout);
             this.mIcon = view.findViewById(R.id.icon);
-            this.mOpen = view.findViewById(R.id.open);
         }
     }
 
