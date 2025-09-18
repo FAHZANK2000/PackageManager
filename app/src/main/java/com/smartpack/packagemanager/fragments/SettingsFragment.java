@@ -105,7 +105,7 @@ public class SettingsFragment extends Fragment {
         mData.add(new SettingsItems(getString(R.string.translations), getString(R.string.translations_summary), sCommonUtils.getDrawable(
                 R.drawable.ic_translate, requireActivity()), null, false, 18));
         mData.add(new SettingsItems(getString(R.string.change_logs), null, sCommonUtils.getDrawable(R.drawable.ic_change_logs, requireActivity()),
-                "https://smartpack.github.io/PackageManager/change-logs/", false, 18));
+                "https://smartpack.github.io/PackageManager/changelog/", false, 18));
         mData.add(new SettingsItems(getString(R.string.share_app), getString(R.string.share_app_Summary), sCommonUtils.getDrawable(R.drawable.ic_share, requireActivity()), null, false, 18));
         mData.add(new SettingsItems(getString(R.string.rate_us), getString(R.string.rate_us_Summary), sCommonUtils.getDrawable(R.drawable.ic_rate, requireActivity()),
                 "https://play.google.com/store/apps/details?id=com.smartpack.packagemanager" + Billing.getPackageExt(), false, 18));
