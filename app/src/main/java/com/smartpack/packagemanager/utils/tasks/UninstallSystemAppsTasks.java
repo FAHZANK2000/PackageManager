@@ -18,6 +18,7 @@ import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.RootShell;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 import com.smartpack.packagemanager.utils.ShizukuShell;
+import com.smartpack.packagemanager.utils.Utils;
 
 import in.sunilpaulmathew.sCommon.CommonUtils.sExecutor;
 
@@ -50,10 +51,11 @@ public class UninstallSystemAppsTasks extends sExecutor {
 
     @Override
     public void doInBackground() {
+        String cmd = "pm uninstall --user " + Utils.getUserID() + " " + mPackageName;
         if (mRootShell.rootAccess()) {
-            mRootShell.runCommand("pm uninstall --user 0 " + mPackageName);
+            mRootShell.runCommand(cmd);
         } else {
-            mShizukuShell.runCommand("pm uninstall --user 0 " + mPackageName);
+            mShizukuShell.runCommand(cmd);
         }
         PackageItems packageItems = PackageData.getRawData().stream()
                 .filter(item -> mPackageName.equals(item.getPackageName()))

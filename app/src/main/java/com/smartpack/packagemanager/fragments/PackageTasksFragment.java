@@ -545,10 +545,11 @@ public class PackageTasksFragment extends Fragment {
                                                     mNewData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
                                                 } else {
                                                     String result;
+                                                    String cmd = "pm uninstall --user " + Utils.getUserID() + " " + batchOptionsItems.getPackageName();
                                                     if (mRootShell.rootAccess()) {
-                                                        result = mRootShell.runAndGetError("pm uninstall --user 0 " + batchOptionsItems.getPackageName());
+                                                        result = mRootShell.runAndGetError(cmd);
                                                     } else {
-                                                        result = mShizukuShell.runAndGetOutput("pm uninstall --user 0 " + batchOptionsItems.getPackageName());
+                                                        result = mShizukuShell.runAndGetOutput(cmd);
                                                     }
                                                     if (result != null && result.trim().equals("Success")) {
                                                         for (int i = 0; i < PackageData.getRawData().size(); i++) {

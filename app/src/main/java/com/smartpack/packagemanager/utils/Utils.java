@@ -37,6 +37,11 @@ public class Utils {
         return ContextCompat.getColor(context, typedValue.resourceId);
     }
 
+    public static int getUserID() {
+        int uid = android.os.Process.myUid();
+        return  uid / 100000;
+    }
+
     public static void navigateToFragment(Activity activity, int position) {
         BottomNavigationView bottomNavigationView = activity.findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(position);
