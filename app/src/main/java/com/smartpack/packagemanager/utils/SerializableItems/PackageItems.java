@@ -10,6 +10,7 @@ package com.smartpack.packagemanager.utils.SerializableItems;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -17,31 +18,57 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import in.sunilpaulmathew.sCommon.PackageUtils.sPackageUtils;
 
 /*
  * Created by sunilpaulmathew <sunil.kde@gmail.com> on February 10, 2020
  */
 public class PackageItems implements Serializable {
 
-    private final long mAPKSize;
-    private final String mPackageName, mAppName;
+    private boolean mSystemApp, mUpdatedSystemApp, mUserApp;
+    private Drawable mAppIcon;
+    private final boolean removed;
+    private final String mPackageName, mAppName, mAPKPath;
     private final Context mContext;
 
-    public PackageItems(String packageName, String appName, long apkSize, Context context) {
+    public PackageItems(String packageName, String appName, String apkPath, boolean removed, Context context) {
         this.mPackageName = packageName;
         this.mAppName = appName;
-        this.mAPKSize = apkSize;
+        this.mAPKPath = apkPath;
+        this.removed = removed;
         this.mContext = context;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public boolean isSystemApp() {
+        return mSystemApp;
+    }
+
+    public boolean isUpdatedSystemApp() {
+        return mUpdatedSystemApp;
+    }
+
+    public boolean isUserApp() {
+        return mUserApp;
     }
 
     public Intent launchIntent() {
         return mContext.getPackageManager().getLaunchIntentForPackage(mPackageName);
+    }
+
+    public File getParentDir() {
+        return new File(mAPKPath).getParentFile();
+    }
+
+    public String getSourceDir() {
+        return mAPKPath;
     }
 
     public String getPackageName() {
@@ -53,7 +80,13 @@ public class PackageItems implements Serializable {
     }
 
     public long getAPKSize() {
-        return mAPKSize;
+        long size = 0;
+        for (File file : Objects.requireNonNull(getParentDir().listFiles())) {
+            if (file.exists() && file.isFile() && file.getName().endsWith(".apk")) {
+                size += file.length();
+            }
+        }
+        return size;
     }
 
     public long getInstalledTime() {
@@ -65,7 +98,7 @@ public class PackageItems implements Serializable {
     }
 
     private Drawable getAppIcon() {
-        return sPackageUtils.getAppIcon(mPackageName, mContext);
+        return mAppIcon;
     }
 
     private static PackageInfo getPackageInfo(String packageName, Context context) {
@@ -79,11 +112,33 @@ public class PackageItems implements Serializable {
     public void loadAppIcon(ImageView view) {
         try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
             Handler handler = new Handler(Looper.getMainLooper());
-
             executor.execute(() -> {
-                Drawable drawable = getAppIcon();
 
-                handler.post(() -> view.setImageDrawable(drawable));
+                PackageManager pm = view.getContext().getPackageManager();
+                ApplicationInfo ai = null;
+
+                try {
+                    if (!removed) {
+                        ai = pm.getApplicationInfo(mPackageName, 0);
+                    } else {
+                        PackageInfo pi = pm.getPackageArchiveInfo(mAPKPath, 0);
+                        if (pi != null) {
+                            ai = pi.applicationInfo;
+                            Objects.requireNonNull(ai).sourceDir = mAPKPath;
+                            ai.publicSourceDir = mAPKPath;
+                        }
+                    }
+
+                    if (ai != null) {
+                        mAppIcon = pm.getApplicationIcon(ai);
+                        mSystemApp = (ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+                        mUpdatedSystemApp = (ai.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+                        mUserApp = !mSystemApp && !mUpdatedSystemApp;
+                    }
+                } catch (PackageManager.NameNotFoundException ignored) {
+                }
+
+                handler.post(() -> view.setImageDrawable(mAppIcon));
             });
         }
     }

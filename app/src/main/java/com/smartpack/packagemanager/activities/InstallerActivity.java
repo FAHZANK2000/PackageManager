@@ -193,7 +193,8 @@ public class InstallerActivity extends AppCompatActivity {
                         PackageData.getRawData().add(new PackageItems(
                                 mPackageName,
                                 sPackageUtils.getAppName(mPackageName, InstallerActivity.this).toString(),
-                                new File(sPackageUtils.getSourceDir(mPackageName, InstallerActivity.this)).length(),
+                                sPackageUtils.getSourceDir(mPackageName, InstallerActivity.this),
+                                false,
                                 InstallerActivity.this)
                         );
                         result.putExtra("INSTALL_STATUS_UPDATE", false);

@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
@@ -28,10 +29,12 @@ import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.RootShell;
+import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 import com.smartpack.packagemanager.utils.ShizukuShell;
 
 import java.util.List;
 
+import in.sunilpaulmathew.sCommon.CommonUtils.sCommonUtils;
 import in.sunilpaulmathew.sCommon.CommonUtils.sExecutor;
 
 /*
@@ -40,10 +43,11 @@ import in.sunilpaulmathew.sCommon.CommonUtils.sExecutor;
 public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledAppsAdapter.ViewHolder> {
 
     private final Activity activity;
-    private final List<String> data, restoreList;
+    private final List<PackageItems> data;
+    private final List<String> restoreList;
     private static boolean batch = false;
 
-    public UninstalledAppsAdapter(List<String> data, List<String> restoreList, Activity activity) {
+    public UninstalledAppsAdapter(List<PackageItems> data, List<String> restoreList, Activity activity) {
         this.data = data;
         this.restoreList = restoreList;
         this.activity = activity;
@@ -53,18 +57,21 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
     @NonNull
     @Override
     public UninstalledAppsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_uninstlled_apps, parent, false);
+        View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view, parent, false);
         return new UninstalledAppsAdapter.ViewHolder(rowItem);
     }
 
     @SuppressLint("StringFormatInvalid")
     @Override
     public void onBindViewHolder(@NonNull UninstalledAppsAdapter.ViewHolder holder, int position) {
-        holder.mTitle.setText(data.get(position));
+        this.data.get(position).loadAppIcon(holder.mAppIcon);
+        holder.mAppName.setText(data.get(position).getAppName());
+        holder.mAppID.setText(data.get(position).getPackageName());
+        holder.mRestore.setIcon(sCommonUtils.getDrawable(R.drawable.ic_restore, holder.mRestore.getContext()));
         holder.mRestore.setOnClickListener(v -> new MaterialAlertDialogBuilder(v.getContext())
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle(R.string.sure_question)
-                .setMessage(v.getContext().getString(R.string.restore_message, data.get(position)))
+                .setMessage(v.getContext().getString(R.string.restore_message, data.get(position).getAppName()))
                 .setNegativeButton(R.string.cancel, (dialog, id) -> {
                 })
                 .setPositiveButton(R.string.restore, (dialog, id) ->
@@ -72,15 +79,15 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
         );
         holder.mRestore.setVisibility(batch ? GONE : VISIBLE);
         holder.mCheckBox.setVisibility(batch ? VISIBLE : GONE);
-        holder.mCheckBox.setChecked(restoreList.contains(data.get(position)));
+        holder.mCheckBox.setChecked(restoreList.contains(data.get(position).getPackageName()));
 
         activity.findViewById(R.id.batch).setVisibility(restoreList.isEmpty() ? GONE : VISIBLE);
 
         holder.mCheckBox.setOnClickListener(v -> {
-            if (restoreList.contains(data.get(position))) {
-                restoreList.remove(data.get(position));
+            if (restoreList.contains(data.get(position).getPackageName())) {
+                restoreList.remove(data.get(position).getPackageName());
             } else {
-                restoreList.add(data.get(position));
+                restoreList.add(data.get(position).getPackageName());
             }
             notifyItemChanged(position);
         });
@@ -100,16 +107,19 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
 
             @Override
             public void doInBackground() {
+                PackageItems packageItems = data.get(position);
                 if (mRootShell.rootAccess()) {
-                    mOutput = mRootShell.runAndGetError("cmd package install-existing " + data.get(position));
+                    mOutput = mRootShell.runAndGetError("cmd package install-existing " + packageItems.getPackageName());
                 } else {
-                    mOutput = mShizukuShell.runAndGetOutput("cmd package install-existing " + data.get(position));
+                    mOutput = mShizukuShell.runAndGetOutput("cmd package install-existing " + packageItems.getPackageName());
                 }
+
+                PackageData.getRemovedPackagesData().remove(packageItems);
+                PackageData.getRawData().add(new PackageItems(packageItems.getPackageName(), packageItems.getAppName(), packageItems.getSourceDir(), false, context));
             }
 
             @Override
             public void onPostExecute() {
-                PackageData.setRawData(null, context);
                 new MaterialAlertDialogBuilder(context)
                         .setIcon(R.mipmap.ic_launcher)
                         .setTitle(mOutput.endsWith("installed for user: 0") ? context.getString(R.string.restore_success_message) : mOutput)
@@ -132,14 +142,18 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final MaterialButton mRestore;
+        private final AppCompatImageButton mAppIcon;
         private final MaterialCheckBox mCheckBox;
-        private final MaterialTextView mTitle;
+        private final MaterialTextView mAppName;
+        private final MaterialTextView mAppID;
 
         public ViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
-            this.mRestore = view.findViewById(R.id.restore);
-            this.mTitle = view.findViewById(R.id.title);
+            this.mAppIcon = view.findViewById(R.id.icon);
+            this.mRestore = view.findViewById(R.id.open);
+            this.mAppName = view.findViewById(R.id.title);
+            this.mAppID = view.findViewById(R.id.description);
             this.mCheckBox = view.findViewById(R.id.checkbox);
 
             view.setOnLongClickListener(v -> {
@@ -148,7 +162,7 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
                     batch = false;
                 } else {
                     batch = true;
-                    restoreList.add(data.get(getBindingAdapterPosition()));
+                    restoreList.add(data.get(getBindingAdapterPosition()).getPackageName());
                 }
                 activity.findViewById(R.id.batch).setVisibility(restoreList.isEmpty() ? GONE : VISIBLE);
                 notifyItemRangeChanged(0, getItemCount());
@@ -159,7 +173,7 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
         @Override
         public void onClick(View view) {
             if (batch) {
-                String packageName = data.get(getBindingAdapterPosition());
+                String packageName = data.get(getBindingAdapterPosition()).getPackageName();
                 if (restoreList.contains(packageName)) {
                     restoreList.remove(packageName);
                 } else {

@@ -72,7 +72,7 @@ public class StartActivity extends AppCompatActivity {
 
             @Override
             public void doInBackground() {
-                PackageData.setRawData(progressBar, activity);
+                PackageData.generateData(progressBar, activity);
             }
 
             @Override

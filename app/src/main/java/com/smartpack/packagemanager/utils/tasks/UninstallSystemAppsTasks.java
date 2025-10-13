@@ -16,6 +16,7 @@ import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.dialogs.ProgressDialog;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.RootShell;
+import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 import com.smartpack.packagemanager.utils.ShizukuShell;
 
 import in.sunilpaulmathew.sCommon.CommonUtils.sExecutor;
@@ -54,11 +55,18 @@ public class UninstallSystemAppsTasks extends sExecutor {
         } else {
             mShizukuShell.runCommand("pm uninstall --user 0 " + mPackageName);
         }
+        PackageItems packageItems = PackageData.getRawData().stream()
+                .filter(item -> mPackageName.equals(item.getPackageName()))
+                .findFirst()
+                .orElse(null);
+        if (packageItems != null) {
+            PackageData.getRawData().remove(packageItems);
+            PackageData.getRemovedPackagesData().add(new PackageItems(packageItems.getPackageName(), packageItems.getAppName(), packageItems.getSourceDir(), true, mActivity));
+        }
     }
 
     @Override
     public void onPostExecute() {
-        PackageData.setRawData(null, mActivity);
         mProgressDialog.dismiss();
         Intent intent = new Intent();
         intent.putExtra("packageName", mPackageName);

@@ -20,10 +20,10 @@ import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import in.sunilpaulmathew.sCommon.CommonUtils.sCommonUtils;
 import in.sunilpaulmathew.sCommon.FileUtils.sFileUtils;
@@ -34,7 +34,7 @@ import in.sunilpaulmathew.sCommon.PackageUtils.sPackageUtils;
  */
 public class PackageData {
 
-    private static List<PackageItems> mRawData = null;
+    private static List<PackageItems> mRawData = null,  mRemovedData = null;
 
     public static boolean isTextMatched(String text, String searchText) {
         for (int a = 0; a < text.length() - searchText.length() + 1; a++) {
@@ -63,35 +63,8 @@ public class PackageData {
 
     }
 
-    private static List<PackageItems> getRawData(ProgressBar progressBar, Context context) {
-        List<PackageItems> mRawData = new ArrayList<>();
-        List<ApplicationInfo> packages = context.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
-        if (progressBar != null) {
-            if (progressBar.isIndeterminate()) {
-                progressBar.setIndeterminate(false);
-            }
-            progressBar.setMax(packages.size());
-        }
-        for (ApplicationInfo packageInfo: packages) {
-            mRawData.add(new PackageItems(
-                    packageInfo.packageName,
-                    getAppName(packageInfo.packageName, context),
-                    new File(sPackageUtils.getSourceDir(packageInfo.packageName, context)).length(),
-                    context)
-            );
-            if (progressBar != null) {
-                if (progressBar.getProgress() < packages.size()) {
-                    progressBar.setProgress(progressBar.getProgress() + 1);
-                } else {
-                    progressBar.setProgress(0);
-                }
-            }
-        }
-        return mRawData;
-    }
-
     public static List<PackageItems> getData(String searchTxt, Context context) {
-        List<PackageItems> mData = new ArrayList<>();
+        List<PackageItems> mData = new CopyOnWriteArrayList<>();
         if (getRawData() != null) {
             boolean mAppType;
             for (PackageItems item : getRawData()) {
@@ -181,8 +154,51 @@ public class PackageData {
         return mRawData;
     }
 
-    public static void setRawData(ProgressBar progressBar, Context context) {
-        mRawData = getRawData(progressBar, context);
+    public static List<PackageItems> getRemovedPackagesData() {
+        return mRemovedData;
+    }
+
+    public static void generateData(ProgressBar progressBar, Context context) {
+        mRawData = new CopyOnWriteArrayList<>();
+        mRemovedData = new CopyOnWriteArrayList<>();
+        PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        if (progressBar != null) {
+            if (progressBar.isIndeterminate()) {
+                progressBar.setIndeterminate(false);
+            }
+            progressBar.setMax(packages.size());
+        }
+        for (ApplicationInfo packageInfo: packages) {
+            boolean disabled = !packageInfo.enabled;
+            boolean removed = (packageInfo.flags & ApplicationInfo.FLAG_INSTALLED) == 0;
+            String appName = pm.getApplicationLabel(packageInfo).toString();
+            String apkPath = packageInfo.sourceDir;
+            if (removed) {
+                mRemovedData.add(new PackageItems(
+                        packageInfo.packageName,
+                        appName + (disabled ? " (Disabled)" : ""),
+                        apkPath,
+                        true,
+                        context)
+                );
+            } else {
+                mRawData.add(new PackageItems(
+                        packageInfo.packageName,
+                        appName,
+                        apkPath,
+                        false,
+                        context)
+                );
+            }
+            if (progressBar != null) {
+                if (progressBar.getProgress() < packages.size()) {
+                    progressBar.setProgress(progressBar.getProgress() + 1);
+                } else {
+                    progressBar.setProgress(0);
+                }
+            }
+        }
     }
 
     public static void setSortingType(int value, Context context) {

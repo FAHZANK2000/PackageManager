@@ -241,7 +241,7 @@ public class PackageTasksFragment extends Fragment {
 
                     @Override
                     public void doInBackground() {
-                        PackageData.setRawData(mProgress, requireActivity());
+                        PackageData.generateData(mProgress, requireActivity());
                         mData = PackageData.getData(mSearchText, requireActivity());
                         mRecycleViewAdapter = new PackageTasksAdapter(mData, mSearchText, mBatchList, diableOrUninstall, requireActivity());
                     }
@@ -474,8 +474,9 @@ public class PackageTasksFragment extends Fragment {
                                                         PackageItems itemOld = PackageData.getRawData().get(i);
                                                         PackageItems itemNew = new PackageItems(
                                                                 itemOld.getPackageName(),
-                                                                sPackageUtils.getAppName(batchOptionsItems.getPackageName(), requireActivity()).toString() + (sPackageUtils.isEnabled(batchOptionsItems.getPackageName(), requireActivity()) ? "" : " (Disabled)"),
-                                                                itemOld.getAPKSize(),
+                                                                sPackageUtils.getAppName(batchOptionsItems.getPackageName(), requireActivity()).toString(),
+                                                                itemOld.getSourceDir(),
+                                                                itemOld.isRemoved(),
                                                                 requireActivity()
                                                         );
                                                         PackageData.getRawData().set(i, itemNew);
@@ -554,6 +555,9 @@ public class PackageTasksFragment extends Fragment {
                                                             if (PackageData.getRawData().get(i).getPackageName().equals(batchOptionsItems.getPackageName())) {
                                                                 PackageItems packageItems = PackageData.getRawData().get(i);
                                                                 PackageData.getRawData().remove(packageItems);
+                                                                if (!packageItems.isUserApp()) {
+                                                                    PackageData.getRemovedPackagesData().add(new PackageItems(packageItems.getPackageName(), packageItems.getAppName(), packageItems.getSourceDir(), true, activity));
+                                                                }
                                                                 int index = mData.indexOf(packageItems);
                                                                 if (index != -1) {
                                                                     mData.remove(packageItems);
@@ -907,8 +911,9 @@ public class PackageTasksFragment extends Fragment {
                                         PackageItems itemOld = mData.get(i);
                                         PackageItems itemNew = new PackageItems(
                                                 itemOld.getPackageName(),
-                                                sPackageUtils.getAppName(itemOld.getPackageName(), requireActivity()).toString() + (sPackageUtils.isEnabled(itemOld.getPackageName(), requireActivity()) ? "" : " (Disabled)"),
-                                                itemOld.getAPKSize(),
+                                                sPackageUtils.getAppName(itemOld.getPackageName(), requireActivity()).toString(),
+                                                itemOld.getSourceDir(),
+                                                itemOld.isRemoved(),
                                                 requireActivity()
                                         );
                                         int index = PackageData.getRawData().indexOf(itemOld);

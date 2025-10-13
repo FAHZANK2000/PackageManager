@@ -27,8 +27,6 @@ import com.smartpack.packagemanager.fragments.ExportedAppsFragment;
 import com.smartpack.packagemanager.fragments.PackageTasksFragment;
 import com.smartpack.packagemanager.fragments.SettingsFragment;
 import com.smartpack.packagemanager.fragments.UninstalledAppsFragment;
-import com.smartpack.packagemanager.utils.RootShell;
-import com.smartpack.packagemanager.utils.ShizukuShell;
 import com.smartpack.packagemanager.utils.tasks.MultipleAPKsTasks;
 import com.smartpack.packagemanager.utils.tasks.SingleAPKTasks;
 
@@ -64,9 +62,7 @@ public class MainActivity extends AppCompatActivity {
         Menu menu = mBottomNav.getMenu();
         menu.add(Menu.NONE, 0, Menu.NONE, null).setIcon(R.drawable.ic_apps);
         menu.add(Menu.NONE, 1, Menu.NONE, null).setIcon(R.drawable.ic_apks);
-        if (new RootShell().rootAccess() || new ShizukuShell().isReady()) {
-            menu.add(Menu.NONE, 2, Menu.NONE, null).setIcon(R.drawable.ic_delete);
-        }
+        menu.add(Menu.NONE, 2, Menu.NONE, null).setIcon(R.drawable.ic_delete);
         menu.add(Menu.NONE, 3, Menu.NONE, null).setIcon(R.drawable.ic_settings);
 
         mBottomNav.setOnItemSelectedListener(
