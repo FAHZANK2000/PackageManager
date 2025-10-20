@@ -46,6 +46,8 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
     private final List<PackageItems> data;
     private final List<String> restoreList;
     private static boolean batch = false;
+    private static final RootShell mRootShell = new RootShell();
+    private static final ShizukuShell mShizukuShell = new ShizukuShell();
 
     public UninstalledAppsAdapter(List<PackageItems> data, List<String> restoreList, Activity activity) {
         this.data = data;
@@ -68,14 +70,19 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
         holder.mAppName.setText(data.get(position).getAppName());
         holder.mAppID.setText(data.get(position).getPackageName());
         holder.mRestore.setIcon(sCommonUtils.getDrawable(R.drawable.ic_restore, holder.mRestore.getContext()));
-        holder.mRestore.setOnClickListener(v -> new MaterialAlertDialogBuilder(v.getContext())
-                .setIcon(R.mipmap.ic_launcher)
-                .setTitle(R.string.sure_question)
-                .setMessage(v.getContext().getString(R.string.restore_message, data.get(position).getAppName()))
-                .setNegativeButton(R.string.cancel, (dialog, id) -> {
-                })
-                .setPositiveButton(R.string.restore, (dialog, id) ->
-                        restore(position, holder.mRestore.getContext()).execute()).show()
+        holder.mRestore.setOnClickListener(v -> {
+            if (!mRootShell.rootAccess() && !mShizukuShell.isReady()) {
+                sCommonUtils.toast(v.getContext().getString(R.string.feature_unavailable_message), v.getContext()).show();
+                return;
+            }
+            new MaterialAlertDialogBuilder(v.getContext())
+                            .setIcon(R.mipmap.ic_launcher)
+                            .setTitle(v.getContext().getString(R.string.restore_message, data.get(position).getAppName()))
+                            .setNegativeButton(R.string.cancel, (dialog, id) -> {
+                            })
+                            .setPositiveButton(R.string.restore, (dialog, id) ->
+                                    restore(position, holder.mRestore.getContext()).execute()).show();
+                }
         );
         holder.mRestore.setVisibility(batch ? GONE : VISIBLE);
         holder.mCheckBox.setVisibility(batch ? VISIBLE : GONE);
@@ -95,14 +102,10 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
 
     private sExecutor restore(int position, Context context) {
         return new sExecutor() {
-            private RootShell mRootShell = null;
-            private ShizukuShell mShizukuShell = null;
             private String mOutput = null;
 
             @Override
             public void onPreExecute() {
-                mRootShell = new RootShell();
-                mShizukuShell = new ShizukuShell();
             }
 
             @Override
@@ -157,6 +160,9 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
             this.mCheckBox = view.findViewById(R.id.checkbox);
 
             view.setOnLongClickListener(v -> {
+                if (!mRootShell.rootAccess() && !mShizukuShell.isReady()) {
+                    return true;
+                }
                 if (batch) {
                     restoreList.clear();
                     batch = false;
