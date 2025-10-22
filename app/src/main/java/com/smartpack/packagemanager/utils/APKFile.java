@@ -11,7 +11,9 @@ package com.smartpack.packagemanager.utils;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +34,7 @@ import in.sunilpaulmathew.sCommon.APKUtils.sAPKUtils;
 public class APKFile extends File {
 
     private Drawable drawable;
-    private String fileName,  pkgName, fileSize;
+    private String appName,  pkgName, fileSize;
 
     public APKFile(String apkPath) {
         super(apkPath);
@@ -46,18 +48,22 @@ public class APKFile extends File {
         try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
             Handler handler = new Handler(Looper.getMainLooper());
             executor.execute(() -> {
-                PackageInfo packageInfo = icon.getContext().getPackageManager().getPackageArchiveInfo(getAbsolutePath(), 0);
-                fileName = getName();
+                PackageManager pm = icon.getContext().getPackageManager();
+                PackageInfo packageInfo = pm.getPackageArchiveInfo(getAbsolutePath(), 0);
                 fileSize = sAPKUtils.getAPKSize(length());
                 if (packageInfo != null) {
-                    drawable = packageInfo.applicationInfo.loadIcon(icon.getContext().getPackageManager());
+                    ApplicationInfo ai = packageInfo.applicationInfo;
+                    ai.sourceDir = getAbsolutePath();
+                    ai.publicSourceDir = getAbsolutePath();
+                    drawable = packageInfo.applicationInfo.loadIcon(pm);
                     pkgName = packageInfo.applicationInfo.packageName;
+                    appName =  pm.getApplicationLabel(ai).toString();
                 }
                 handler.post(() -> {
                     if (drawable != null) {
                         icon.setImageDrawable(drawable);
                     }
-                    name.setText(fileName);
+                    name.setText(appName);
                     if (pkgName != null) {
                         packageName.setText(pkgName);
                         packageName.setVisibility(VISIBLE);
