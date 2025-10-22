@@ -33,7 +33,6 @@ import in.sunilpaulmathew.sCommon.CommonUtils.sExecutor;
  * Created by sunilpaulmathew <sunil.kde@gmail.com> on February 16, 2021
  */
 public class ActivitiesFragment extends Fragment {
-
     private String mPackageName;
 
     public ActivitiesFragment() {

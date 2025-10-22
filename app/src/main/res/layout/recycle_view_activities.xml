@@ -53,34 +53,32 @@
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/launch_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|end"
             android:orientation="horizontal"
-            android:layout_marginTop="-5sp"
-            android:layout_marginEnd="10sp"
             android:gravity="center" >
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:layout_width="16sp"
-                    android:layout_height="16sp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_open"
-                    android:layout_marginEnd="5dp"
-                    android:tint="?attr/colorPrimary"
-                    android:scaleType="fitCenter"
-                    android:background="@null"
-                    android:clickable="false" />
-
-                <com.google.android.material.textview.MaterialTextView
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/shortcut"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?attr/colorPrimary"
-                    android:textStyle="bold|italic"
-                    android:layout_gravity="center"
+                    android:text="@string/shortcut_create"
+                    app:iconTint="?attr/colorPrimary"
+                    app:icon="@drawable/ic_shortcut"
+                    android:textAllCaps="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/launch"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/colorPrimary"
+                    app:iconTint="?attr/colorPrimary"
+                    app:icon="@drawable/ic_open"
                     android:text="@string/open"
-                    android:focusable="false"
-                    android:gravity="center" />
+                    android:textAllCaps="false" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>
