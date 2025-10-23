@@ -3,82 +3,93 @@
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="start|center_vertical"
+    android:layout_gravity="center"
+    android:gravity="start|center"
     android:orientation="vertical" >
 
-        <com.google.android.material.card.MaterialCardView
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5sp"
-            app:cardCornerRadius="15sp" >
+            android:gravity="start|center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon"
+                    android:layout_width="36sp"
+                    android:layout_height="36sp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="fitCenter"
+                    android:background="@null" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="start|center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical" >
 
-                        <androidx.appcompat.widget.AppCompatImageButton
-                            android:id="@+id/icon"
-                            android:layout_width="24sp"
-                            android:layout_height="24sp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="5dp"
-                            android:scaleType="fitCenter"
-                            android:background="@null"  />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:textStyle="bold"
+                            android:textSize="17sp"
+                            android:maxLines="1" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="italic"
+                            android:focusable="false" />
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical" >
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal" >
 
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:id="@+id/title"
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/shortcut"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:focusable="false"
-                                    android:textStyle="bold"
-                                    android:textSize="17sp"
-                                    android:maxLines="1" />
+                                    android:textColor="?attr/colorPrimary"
+                                    android:text="@string/shortcut_create"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:backgroundTint="@android:color/transparent"
+                                    android:background="@android:color/transparent"
+                                    app:iconTint="?attr/colorPrimary"
+                                    app:icon="@drawable/ic_shortcut"
+                                    android:textAllCaps="false"
+                                    android:insetBottom="0dp"
+                                    android:minHeight="0dp"
+                                    android:minWidth="0dp"
+                                    android:insetTop="0dp" />
 
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:id="@+id/description"
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/launch"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textStyle="italic"
-                                    android:focusable="false" />
+                                    android:textColor="?attr/colorPrimary"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:backgroundTint="@android:color/transparent"
+                                    android:background="@android:color/transparent"
+                                    app:iconTint="?attr/colorPrimary"
+                                    app:icon="@drawable/ic_open"
+                                    android:text="@string/open"
+                                    android:textAllCaps="false"
+                                    android:insetBottom="0dp"
+                                    android:minHeight="0dp"
+                                    android:minWidth="0dp"
+                                    android:insetTop="0dp" />
                         </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
-        </com.google.android.material.card.MaterialCardView>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|end"
-            android:orientation="horizontal"
-            android:gravity="center" >
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/shortcut"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorPrimary"
-                    android:text="@string/shortcut_create"
-                    app:iconTint="?attr/colorPrimary"
-                    app:icon="@drawable/ic_shortcut"
-                    android:textAllCaps="false" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/launch"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorPrimary"
-                    app:iconTint="?attr/colorPrimary"
-                    app:icon="@drawable/ic_open"
-                    android:text="@string/open"
-                    android:textAllCaps="false" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

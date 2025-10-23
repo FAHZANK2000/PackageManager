@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,6 +73,7 @@ public class ActivitiesFragment extends Fragment {
                 mRecyclerView = mRootView.findViewById(R.id.recycler_view);
                 mProgressBar.setVisibility(VISIBLE);
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+                mRecyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
             }
 
             @Override
