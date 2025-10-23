@@ -21,8 +21,10 @@ import com.smartpack.packagemanager.activities.APKPickerActivity;
 import com.smartpack.packagemanager.dialogs.BundleInstallDialog;
 import com.smartpack.packagemanager.dialogs.ProgressDialog;
 import com.smartpack.packagemanager.utils.FilePicker;
+import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.SerializableItems.APKPickerItems;
 import com.smartpack.packagemanager.utils.SplitAPKInstaller;
+import com.smartpack.packagemanager.utils.ZipFileUtils;
 
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -65,6 +67,16 @@ public class SingleAPKTasks extends sExecutor {
         mProgressDialog.show();
     }
 
+    private void generateAPKList(File parentFile) {
+        for (File files : Objects.requireNonNull(parentFile.listFiles())) {
+            if (files.isDirectory()) {
+                generateAPKList(files);
+            } else if (files.isFile() && files.getName().endsWith(".apk")) {
+                mAPKs.add(new APKPickerItems(files, FilePicker.isSelectedAPK(files, mActivity)));
+            }
+        }
+    }
+
     @Override
     public void doInBackground() {
         mFileName = Objects.requireNonNull(DocumentFile.fromSingleUri(mActivity, mURIFile)).getName();
@@ -77,25 +89,14 @@ public class SingleAPKTasks extends sExecutor {
             for (File files : SplitAPKInstaller.getFilesList(mActivity.getCacheDir())) {
                 sFileUtils.delete(files);
             }
-            LocalFileHeader localFileHeader;
-            int readLen;
-            byte[] readBuffer = new byte[4096];
-            try {
-                InputStream inputStream = mActivity.getContentResolver().openInputStream(mURIFile);
-                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-                while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-                    if (localFileHeader.getFileName().endsWith(".apk")) {
-                        File apkFile = new File(mActivity.getCacheDir(), localFileHeader.getFileName());
-                        mAPKs.add(new APKPickerItems(apkFile, FilePicker.isSelectedAPK(apkFile, mActivity)));
 
-                        try (FileOutputStream fileOutputStream = new FileOutputStream(apkFile)) {
-                            while ((readLen = zipInputStream.read(readBuffer)) != -1) {
-                                fileOutputStream.write(readBuffer, 0, readLen);
-                            }
-                        } catch (IOException ignored) {}
-                    }
-                }
+            try (ZipFileUtils zipFileUtils = new ZipFileUtils(mURIFile, mActivity)) {
+                zipFileUtils.setProgress(mProgressDialog);
+                zipFileUtils.unzip(mActivity.getCacheDir().getAbsolutePath());
             } catch (IOException ignored) {}
+
+            generateAPKList(mActivity.getCacheDir());
+
             mAPKs.sort((lhs, rhs) -> String.CASE_INSENSITIVE_ORDER.compare(lhs.getAPKName(), rhs.getAPKName()));
         }
     }
