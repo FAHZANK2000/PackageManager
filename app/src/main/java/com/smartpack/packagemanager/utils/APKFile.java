@@ -63,7 +63,7 @@ public class APKFile extends File {
                     if (drawable != null) {
                         icon.setImageDrawable(drawable);
                     }
-                    name.setText(appName);
+                    name.setText(appName != null ? appName : getName());
                     if (pkgName != null) {
                         packageName.setText(pkgName);
                         packageName.setVisibility(VISIBLE);
