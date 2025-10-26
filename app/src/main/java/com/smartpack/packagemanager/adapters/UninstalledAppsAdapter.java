@@ -27,6 +27,7 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.RootShell;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
@@ -98,6 +99,8 @@ public class UninstalledAppsAdapter extends RecyclerView.Adapter<UninstalledApps
             }
             notifyItemChanged(position);
         });
+
+        AppSettings.setSlideInAnimation(holder.mAppIcon, position);
     }
 
     private sExecutor restore(int position, Context context) {

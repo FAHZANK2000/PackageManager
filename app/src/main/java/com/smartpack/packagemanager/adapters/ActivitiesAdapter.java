@@ -30,11 +30,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageExplorer;
 import com.smartpack.packagemanager.utils.SerializableItems.ActivityItems;
 
@@ -97,6 +99,8 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Vi
             } catch (PackageManager.NameNotFoundException | SecurityException ignored) {
             }
         });
+        
+        AppSettings.setSlideInAnimation(holder.mIconsLayout, position);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -136,12 +140,14 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final AppCompatImageButton mIcon;
+        private final LinearLayoutCompat mIconsLayout;
         private final MaterialButton mLaunch, mShortcut;
         private final MaterialTextView mLabel, mName;
 
         public ViewHolder(View view) {
             super(view);
             this.mLabel = view.findViewById(R.id.title);
+            this.mIconsLayout = view.findViewById(R.id.icons_layout);
             this.mName = view.findViewById(R.id.description);
             this.mLaunch = view.findViewById(R.id.launch);
             this.mShortcut = view.findViewById(R.id.shortcut);

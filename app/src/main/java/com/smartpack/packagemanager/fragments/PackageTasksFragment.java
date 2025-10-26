@@ -819,7 +819,6 @@ public class PackageTasksFragment extends Fragment {
             public void onPreExecute() {
                 mProgress.setVisibility(View.VISIBLE);
                 mRecyclerView.setVisibility(GONE);
-                //mData = new CopyOnWriteArrayList<>();
                 if (mBatchList == null) {
                     mBatchList = new ArrayList<>();
                 }

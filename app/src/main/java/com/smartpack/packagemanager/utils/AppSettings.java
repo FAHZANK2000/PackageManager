@@ -10,6 +10,8 @@ package com.smartpack.packagemanager.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 
 import com.smartpack.packagemanager.R;
 
@@ -458,6 +460,25 @@ public class AppSettings {
                 Utils.restartApp(activity);
             }
         }.show();
+    }
+
+    public static void setSlideInAnimation(final View viewToAnimate, int position) {
+        // Only animate items appearing for the first time
+        if (position > -1) {
+            viewToAnimate.setTranslationY(50f);
+            viewToAnimate.setAlpha(0f);
+
+            viewToAnimate.animate()
+                    .translationY(0f)
+                    .alpha(1f)
+                    .setDuration(150)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .start();
+        } else {
+            // Reset properties to ensure recycled views are displayed correctly
+            viewToAnimate.setTranslationY(0f);
+            viewToAnimate.setAlpha(1f);
+        }
     }
 
 }

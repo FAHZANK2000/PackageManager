@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class APKDetailsAdapter extends RecyclerView.Adapter<APKDetailsAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull APKDetailsAdapter.ViewHolder holder, int position) {
         holder.mText.setText(data.get(position));
+
+        AppSettings.setSlideInAnimation(holder.itemView, position);
     }
 
     @Override

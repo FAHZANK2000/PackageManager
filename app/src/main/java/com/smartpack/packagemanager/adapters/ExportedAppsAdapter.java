@@ -36,6 +36,7 @@ import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.dialogs.BundleInstallDialog;
 import com.smartpack.packagemanager.dialogs.ProgressDialog;
 import com.smartpack.packagemanager.utils.APKFile;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.FilePicker;
 import com.smartpack.packagemanager.utils.SerializableItems.APKPickerItems;
 import com.smartpack.packagemanager.utils.SplitAPKInstaller;
@@ -147,6 +148,8 @@ public class ExportedAppsAdapter extends RecyclerView.Adapter<ExportedAppsAdapte
             });
             popupMenu.show();
         });
+
+        AppSettings.setSlideInAnimation(holder.mIcon, position);
     }
 
     public interface OnInstallRequest {

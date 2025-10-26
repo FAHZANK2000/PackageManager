@@ -32,6 +32,7 @@ import com.smartpack.packagemanager.BuildConfig;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.activities.ImageViewActivity;
 import com.smartpack.packagemanager.activities.PackageDetailsActivity;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 import com.smartpack.packagemanager.utils.Utils;
@@ -144,6 +145,8 @@ public class PackageTasksAdapter extends RecyclerView.Adapter<PackageTasksAdapte
             MaterialButton batchButton = activity.findViewById(R.id.batch);
             batchButton.setVisibility(!batchList.isEmpty() ? View.VISIBLE : View.GONE);
             batchButton.setText(activity.getString(R.string.batch_options, batchList.size()));
+
+            AppSettings.setSlideInAnimation(holder.appIcon, position);
         } catch (IndexOutOfBoundsException ignored) {}
     }
 

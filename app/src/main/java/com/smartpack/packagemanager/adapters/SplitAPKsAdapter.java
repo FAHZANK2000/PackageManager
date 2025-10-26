@@ -26,6 +26,7 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageExplorer;
 
 import java.io.File;
@@ -98,6 +99,8 @@ public class SplitAPKsAdapter extends RecyclerView.Adapter<SplitAPKsAdapter.View
                                 .getContext()) + "/" + data.get(position), packageName, activity)
                 ).show()
         );
+
+        AppSettings.setSlideInAnimation(holder.mIcon, position);
     }
 
     @Override

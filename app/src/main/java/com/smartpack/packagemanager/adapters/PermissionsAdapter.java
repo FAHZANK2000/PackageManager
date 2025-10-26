@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.SerializableItems.PermissionsItems;
 import com.smartpack.packagemanager.utils.RootShell;
 import com.smartpack.packagemanager.utils.ShizukuShell;
@@ -74,6 +75,8 @@ public class PermissionsAdapter extends RecyclerView.Adapter<PermissionsAdapter.
             holder.mGranted.setEnabled(false);
             holder.mGranted.setClickable(false);
         }
+
+        AppSettings.setSlideInAnimation(holder.mGranted, position);
     }
 
     @Override

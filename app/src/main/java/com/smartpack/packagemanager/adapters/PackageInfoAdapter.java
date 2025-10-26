@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageInfoItems;
 
 import java.util.List;
@@ -74,6 +75,8 @@ public class PackageInfoAdapter extends RecyclerView.Adapter<PackageInfoAdapter.
         } else {
             holder.mIcon.setVisibility(View.GONE);
         }
+
+        AppSettings.setSlideInAnimation(holder.itemView, position);
     }
 
     @Override

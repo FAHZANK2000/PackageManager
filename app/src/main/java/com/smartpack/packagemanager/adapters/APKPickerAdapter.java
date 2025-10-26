@@ -20,6 +20,7 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.utils.APKFile;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.SerializableItems.APKPickerItems;
 
 import java.util.List;
@@ -48,6 +49,8 @@ public class APKPickerAdapter extends RecyclerView.Adapter<APKPickerAdapter.View
         holder.mSize.setVisibility(View.VISIBLE);
         holder.mCheckBox.setChecked(data.get(position).isSelected());
         holder.mCheckBox.setVisibility(View.VISIBLE);
+
+        AppSettings.setSlideInAnimation(holder.mCheckBox, position);
     }
 
     @Override

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.SerializableItems.BatchOptionsItems;
 
 import java.util.List;
@@ -66,6 +67,8 @@ public class BatchOptionsAdapter extends RecyclerView.Adapter<BatchOptionsAdapte
                 data.get(position).getStatus() == 0 ? holder.mInfoButton.getContext().getString(R.string.ignored) : holder.mInfoButton.getContext()
                         .getString(R.string.failed)), holder.mInfoButton.getContext()).show());
         holder.mCheckBox.setOnClickListener(v -> data.get(position).setChecked(holder.mCheckBox.isChecked()));
+
+        AppSettings.setSlideInAnimation(holder.mAppIcon, position);
     }
 
     @Override

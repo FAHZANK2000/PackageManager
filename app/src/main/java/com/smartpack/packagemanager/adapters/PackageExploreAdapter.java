@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageExplorer;
 
 import java.io.File;
@@ -92,6 +93,8 @@ public class PackageExploreAdapter extends RecyclerView.Adapter<PackageExploreAd
         }
 
         holder.mExport.setOnClickListener(v -> PackageExplorer.copyToStorage(data.get(position), packageName, activity));
+
+        AppSettings.setSlideInAnimation(holder.itemView, position);
     }
 
     @Override

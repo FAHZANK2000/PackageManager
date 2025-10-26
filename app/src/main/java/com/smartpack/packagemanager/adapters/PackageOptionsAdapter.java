@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.smartpack.packagemanager.R;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageOptionsItems;
 
 import java.util.List;
@@ -44,6 +45,8 @@ public class PackageOptionsAdapter extends RecyclerView.Adapter<PackageOptionsAd
     public void onBindViewHolder(@NonNull PackageOptionsAdapter.ViewHolder holder, int position) {
         holder.mIcon.setText(data.get(position).getText());
         holder.mIcon.setIcon(data.get(position).getIcon());
+
+        AppSettings.setSlideInAnimation(holder.itemView, position);
     }
 
     @Override
