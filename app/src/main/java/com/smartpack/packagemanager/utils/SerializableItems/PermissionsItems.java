@@ -16,7 +16,8 @@ import java.io.Serializable;
 public class PermissionsItems implements Serializable {
 
     private final boolean mGranted;
-    private final String mTitle, mDescription;
+    private final String mTitle;
+    private String mDescription;
 
     public PermissionsItems(boolean granted, String title, String description) {
         this.mGranted = granted;
@@ -34,6 +35,10 @@ public class PermissionsItems implements Serializable {
 
     public String getDescription() {
         return mDescription;
+    }
+
+    public void setDescription(String description) {
+        this.mDescription = description;
     }
 
 }

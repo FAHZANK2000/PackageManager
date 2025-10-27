@@ -62,7 +62,7 @@ public class AppOpsFragment extends Fragment {
         RecyclerView mRecyclerView = mRootView.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
-        AppOpsAdapter mRecycleViewAdapter = new AppOpsAdapter(AppOps.getOps(mPackageName, requireActivity()), mPackageName);
+        AppOpsAdapter mRecycleViewAdapter = new AppOpsAdapter(AppOps.getOps(mPackageName), mPackageName);
         mRecyclerView.setAdapter(mRecycleViewAdapter);
 
         return mRootView;

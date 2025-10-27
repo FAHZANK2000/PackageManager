@@ -47,7 +47,7 @@ public class PermissionsAdapter extends RecyclerView.Adapter<PermissionsAdapter.
     @NonNull
     @Override
     public PermissionsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View mRootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_appops, parent, false);
+        View mRootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_permissions, parent, false);
         if (!apkPicked && (!mRootShell.rootAccess() && !mShizukuShell.isReady())) {
             mRootView.setOnClickListener(v -> sCommonUtils.toast(mRootView
                     .getContext().getString(R.string.feature_unavailable_message), v.getContext()).show());

@@ -106,6 +106,17 @@
     <string name="open_failed">%s is not designed to run in user space</string>
     <string name="open_failed_export_message">Unable to open %s. Do you want to export it into device storage?</string>
     <string name="operations">Operations</string>
+    <string name="operations_allow_title">Allow</string>
+    <string name="operations_allow_description">Always permit this operation</string>
+    <string name="operations_failed_toast">Failed to change the status of %s</string>
+    <string name="operations_ignore_title">Ignore</string>
+    <string name="operations_ignore_description">Always block/silently drop the operation</string>
+    <string name="operations_deny_title">Deny</string>
+    <string name="operations_deny_description">Explicitly reject (like ignore, but may return an error)</string>
+    <string name="operations_default_title">Default</string>
+    <string name="operations_default_description">Use system’s default behavior (based on app’s declared permission and user grant state)</string>
+    <string name="operations_foreground_title">Foreground</string>
+    <string name="operations_foreground_description">Allow only when app is in foreground (for ops like location, mic, camera)</string>
     <string name="operations_warning">Changing some operations will be dangerous. Please do it only if you know what you\'re doing. Also, please be aware that some operations are simply unchangeable (close and check back this page to know the new status).</string>
     <string name="other">Other</string>
     <string name="package_id">Package ID</string>

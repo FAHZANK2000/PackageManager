@@ -73,7 +73,7 @@ public class PackageDetailsActivity extends AppCompatActivity {
         if (!PackageDetails.getPermissions(packageName, this).isEmpty()) {
             adapter.AddFragment(PermissionsFragment.newInstance(packageName, apkPicked), getString(R.string.permissions));
         }
-        if ((new RootShell().rootAccess() || new ShizukuShell().isReady()) && !AppOps.getOps(packageName, this).isEmpty()) {
+        if ((new RootShell().rootAccess() || new ShizukuShell().isReady()) && !AppOps.getOps(packageName).isEmpty()) {
             adapter.AddFragment(AppOpsFragment.newInstance(packageName), getString(R.string.operations));
         }
         if (!PackageDetails.getActivities(packageName, this).isEmpty()) {

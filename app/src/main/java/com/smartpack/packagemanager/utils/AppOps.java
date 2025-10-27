@@ -8,13 +8,9 @@
 
 package com.smartpack.packagemanager.utils;
 
-import android.content.Context;
-
 import com.smartpack.packagemanager.utils.SerializableItems.PermissionsItems;
 
 import java.util.ArrayList;
-
-import in.sunilpaulmathew.sCommon.PermissionUtils.sPermissionUtils;
 
 /*
  * Created by Lennoard <lennoardrai@gmail.com> on Mar 14, 2021
@@ -22,7 +18,7 @@ import in.sunilpaulmathew.sCommon.PermissionUtils.sPermissionUtils;
  */
 public class AppOps {
 
-    public static ArrayList<PermissionsItems> getOps(String packageName, Context context) {
+    public static ArrayList<PermissionsItems> getOps(String packageName) {
         ArrayList<PermissionsItems> mData = new ArrayList<>();
         String[] appOpsList;
         if (new RootShell().rootAccess()) {
@@ -34,13 +30,14 @@ public class AppOps {
         }
         for (String line : appOpsList) {
             String[] splitOp = line.split(":");
-            String name = splitOp[0];
+            String name = splitOp[0].trim();
+            String status = splitOp[1].trim();
             /*
              * We don't need a single "No operations." item if operations are empty.
              * Also, "Uid mode" needs more work (and likely never work)
              */
-            if (!line.equals("No operations.") && !name.equals("Uid mode")) {
-                mData.add(new PermissionsItems((line.contains("allow") || line.contains("ignore")), name, sPermissionUtils.getDescription(name, context)));
+            if (line.contains("time=") && !line.equals("No operations.") && !name.equals("Uid mode")) {
+                mData.add(new PermissionsItems(line.contains("allow"), name, status));
             }
         }
         return mData;
