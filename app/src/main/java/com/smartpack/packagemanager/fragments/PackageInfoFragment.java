@@ -63,18 +63,19 @@ import in.sunilpaulmathew.sCommon.PermissionUtils.sPermissionUtils;
  */
 public class PackageInfoFragment extends Fragment {
 
-    private boolean mLaunchIntent = false, mRootOrShizuku = false;
+    private boolean mLaunchIntent = false, mRootOrShizuku = false, mSystemApp = false;
     private String mAppName, mPackageName;
 
     public PackageInfoFragment() {
     }
 
-    public static PackageInfoFragment newInstance(String appName, String packageName, boolean launchIntent) {
+    public static PackageInfoFragment newInstance(String appName, String packageName, boolean systemApp, boolean launchIntent) {
         PackageInfoFragment fragment = new PackageInfoFragment();
 
         Bundle args = new Bundle();
         args.putString("appNameIntent", appName);
         args.putString("packageNameIntent", packageName);
+        args.putBoolean("isSystemApp", systemApp);
         args.putBoolean("launchIntent", launchIntent);
         fragment.setArguments(args);
         return fragment;
@@ -87,6 +88,7 @@ public class PackageInfoFragment extends Fragment {
         if (getArguments() != null) {
             mAppName = getArguments().getString("appNameIntent");
             mPackageName = getArguments().getString("packageNameIntent");
+            mSystemApp = getArguments().getBoolean("isSystemApp");
             mLaunchIntent = getArguments().getBoolean("launchIntent");
         }
     }
@@ -147,7 +149,7 @@ public class PackageInfoFragment extends Fragment {
                 case 3:
                     if (mPackageName.equals(BuildConfig.APPLICATION_ID)) {
                         sCommonUtils.toast(getString(R.string.uninstall_nope), requireActivity()).show();
-                    } else if (!sPackageUtils.isSystemApp(mPackageName, requireActivity())) {
+                    } else if (!mSystemApp) {
                         Intent intent = new Intent();
                         intent.putExtra("packageName", mPackageName);
                         requireActivity().setResult(Activity.RESULT_OK, intent);
@@ -252,8 +254,8 @@ public class PackageInfoFragment extends Fragment {
         mPackageInfoItems.add(new PackageInfoItems(getString(R.string.package_id), mPackageName, null, null,
                 getString(R.string.more), sCommonUtils.getDrawable(R.drawable.ic_dots, requireActivity())));
         mPackageInfoItems.add(new PackageInfoItems(getString(mAppBundle ? R.string.bundle_path : R.string.apk_path), sPackageUtils.getParentDir(
-                mPackageName, requireActivity()), null, mAppBundle ? getString(R.string.size_bundle, PackageData
-                .getBundleSize(sPackageUtils.getParentDir(mPackageName, requireActivity()))) : getString(R.string.size_apk,
+                mPackageName, requireActivity()), null, mAppBundle ? getString(R.string.size_bundle, sAPKUtils.getAPKSize(PackageData
+                .getBundleSize(sPackageUtils.getParentDir(mPackageName, requireActivity())))) : getString(R.string.size_apk,
                 sAPKUtils.getAPKSize(new File(sPackageUtils.getSourceDir(mPackageName, requireActivity())).length())), getString(R.string.export), sCommonUtils.getDrawable(
                 R.drawable.ic_download, requireActivity())));
         mPackageInfoItems.add(new PackageInfoItems(getString(R.string.data_dir), sPackageUtils.getDataDir(mPackageName, requireActivity()), null, null,

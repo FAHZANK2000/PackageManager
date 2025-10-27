@@ -42,7 +42,7 @@ import in.sunilpaulmathew.sCommon.PackageUtils.sPackageUtils;
  */
 public class PackageDetailsActivity extends AppCompatActivity {
 
-    public static final String APP_NAME_INTENT = "app_name", LAUNCHER_INTENT = "launcher", PACKAGE_NAME_INTENT = "package_name", APK_PICKED = "apk_picked";
+    public static final String APP_NAME_INTENT = "app_name", SYSTEM_APP = "systemApp", LAUNCHER_INTENT = "launcher", PACKAGE_NAME_INTENT = "package_name", APK_PICKED = "apk_picked";
 
     @SuppressLint("StringFormatInvalid")
     @Override
@@ -58,6 +58,7 @@ public class PackageDetailsActivity extends AppCompatActivity {
 
         String packageName = getIntent().getStringExtra(PACKAGE_NAME_INTENT);
         String appName = getIntent().getStringExtra(APP_NAME_INTENT);
+        boolean systemApp = getIntent().getBooleanExtra(SYSTEM_APP, false);
         boolean launchable = getIntent().getBooleanExtra(LAUNCHER_INTENT, false);
         boolean apkPicked = getIntent().getBooleanExtra(APK_PICKED, false);
 
@@ -66,7 +67,7 @@ public class PackageDetailsActivity extends AppCompatActivity {
         mVersion.setText(getString(R.string.version, sAPKUtils.getVersionName(sPackageUtils.getSourceDir(packageName, this), this)));
 
         sPagerAdapter adapter = new sPagerAdapter(getSupportFragmentManager());
-        adapter.AddFragment(PackageInfoFragment.newInstance(appName, packageName, launchable), getString(R.string.app_info));
+        adapter.AddFragment(PackageInfoFragment.newInstance(appName, packageName, systemApp, launchable), getString(R.string.app_info));
         if (new File(sPackageUtils.getSourceDir(packageName, this)).getName().equals("base.apk") && SplitAPKInstaller.splitApks(sPackageUtils.getParentDir(packageName, this)).size() > 1) {
             adapter.AddFragment(SplitApksFragment.newInstance(packageName), getString(R.string.split_apk));
         }

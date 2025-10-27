@@ -206,6 +206,7 @@ public class PackageTasksAdapter extends RecyclerView.Adapter<PackageTasksAdapte
                 Intent details = new Intent(view.getContext(), PackageDetailsActivity.class);
                 details.putExtra(PackageDetailsActivity.APP_NAME_INTENT, packageItems.getAppName());
                 details.putExtra(PackageDetailsActivity.PACKAGE_NAME_INTENT, packageItems.getPackageName());
+                details.putExtra(PackageDetailsActivity.SYSTEM_APP, packageItems.isSystemApp());
                 details.putExtra(PackageDetailsActivity.LAUNCHER_INTENT, packageItems.launchIntent() != null);
                 details.putExtra(PackageDetailsActivity.APK_PICKED, false);
                 uninstallApps.launch(details);

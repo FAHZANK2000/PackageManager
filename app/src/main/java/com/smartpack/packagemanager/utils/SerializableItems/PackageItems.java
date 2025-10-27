@@ -51,20 +51,12 @@ public class PackageItems implements Serializable {
         return mSystemApp;
     }
 
-    public boolean isUpdatedSystemApp() {
-        return mUpdatedSystemApp;
-    }
-
     public boolean isUserApp() {
         return mUserApp;
     }
 
     public Intent launchIntent() {
         return mContext.getPackageManager().getLaunchIntentForPackage(mPackageName);
-    }
-
-    public File getParentDir() {
-        return new File(mAPKPath).getParentFile();
     }
 
     public String getSourceDir() {
@@ -80,13 +72,7 @@ public class PackageItems implements Serializable {
     }
 
     public long getAPKSize() {
-        long size = 0;
-        for (File file : Objects.requireNonNull(getParentDir().listFiles())) {
-            if (file.exists() && file.isFile() && file.getName().endsWith(".apk")) {
-                size += file.length();
-            }
-        }
-        return size;
+        return new File(mAPKPath).length();
     }
 
     public long getInstalledTime() {
@@ -95,10 +81,6 @@ public class PackageItems implements Serializable {
 
     public long getUpdatedTime() {
         return Objects.requireNonNull(getPackageInfo(getPackageName(), mContext)).firstInstallTime;
-    }
-
-    private Drawable getAppIcon() {
-        return mAppIcon;
     }
 
     private static PackageInfo getPackageInfo(String packageName, Context context) {

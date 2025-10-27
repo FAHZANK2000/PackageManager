@@ -123,7 +123,7 @@ public class PackageDetails {
             if (new File(sPackageUtils.getSourceDir(packageName, context)).getName().equals("base.apk") && SplitAPKInstaller
                     .splitApks(sPackageUtils.getParentDir(packageName, context)).size() > 1) {
                 obj.put("App Bundle", true);
-                obj.put("Bundle Size", PackageData.getBundleSize(sPackageUtils.getParentDir(packageName, context)));
+                obj.put("Bundle Size", sAPKUtils.getAPKSize(PackageData.getBundleSize(sPackageUtils.getParentDir(packageName, context))));
                 JSONArray apks = new JSONArray();
                 for (String apk : SplitAPKInstaller
                         .splitApks(sPackageUtils.getParentDir(packageName, context))) {
