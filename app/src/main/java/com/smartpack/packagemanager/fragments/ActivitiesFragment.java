@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -91,6 +92,14 @@ public class ActivitiesFragment extends Fragment {
                 mRecyclerView.setAdapter(mRecycleViewAdapter);
             }
         }.execute();
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isAdded()) return;
+                requireActivity().finish();
+            }
+        });
 
         return mRootView;
     }

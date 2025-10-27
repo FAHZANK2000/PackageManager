@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -64,6 +65,14 @@ public class AppOpsFragment extends Fragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
         AppOpsAdapter mRecycleViewAdapter = new AppOpsAdapter(AppOps.getOps(mPackageName), mPackageName);
         mRecyclerView.setAdapter(mRecycleViewAdapter);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isAdded()) return;
+                requireActivity().finish();
+            }
+        });
 
         return mRootView;
     }

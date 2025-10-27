@@ -223,7 +223,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void handleOnBackPressed() {
 
-                Utils.navigateToFragment(requireActivity(), 0);
+                AppSettings.navigateToFragment(requireActivity(), 0);
             }
         });
 

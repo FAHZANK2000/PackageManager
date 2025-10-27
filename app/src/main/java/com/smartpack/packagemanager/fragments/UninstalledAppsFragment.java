@@ -35,6 +35,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.adapters.UninstalledAppsAdapter;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.RootShell;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
@@ -148,7 +149,7 @@ public class UninstalledAppsFragment extends Fragment {
                     return;
                 }
 
-                Utils.navigateToFragment(requireActivity(), 0);
+                AppSettings.navigateToFragment(requireActivity(), 0);
             }
         });
 

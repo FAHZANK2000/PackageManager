@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -40,6 +41,14 @@ public class CertificateFragment extends Fragment {
             } catch (Exception ignored) {
             }
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isAdded()) return;
+                requireActivity().finish();
+            }
+        });
 
         return mRootView;
     }

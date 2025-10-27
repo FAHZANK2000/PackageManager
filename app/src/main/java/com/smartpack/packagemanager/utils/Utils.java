@@ -18,9 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.smartpack.packagemanager.MainActivity;
-import com.smartpack.packagemanager.R;
 
 /*
  * Created by sunilpaulmathew <sunil.kde@gmail.com> on October 07, 2020
@@ -40,11 +38,6 @@ public class Utils {
     public static int getUserID() {
         int uid = android.os.Process.myUid();
         return  uid / 100000;
-    }
-
-    public static void navigateToFragment(Activity activity, int position) {
-        BottomNavigationView bottomNavigationView = activity.findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(position);
     }
 
     public static void restartApp(Activity activity) {

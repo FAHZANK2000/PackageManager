@@ -113,6 +113,7 @@ public class ManifestFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                if (!isAdded()) return;
                 if (mProgress.getVisibility() == VISIBLE) {
                     return;
                 }

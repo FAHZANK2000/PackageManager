@@ -13,6 +13,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.smartpack.packagemanager.R;
 
 import java.util.ArrayList;
@@ -272,6 +273,11 @@ public class AppSettings {
                 context.getString(R.string.language_zh, "Hans"),
                 context.getString(R.string.language_zh, "Hant"),
         };
+    }
+
+    public static void navigateToFragment(Activity activity, int position) {
+        BottomNavigationView bottomNavigationView = activity.findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(position);
     }
 
     public static void setLanguage(Activity activity) {

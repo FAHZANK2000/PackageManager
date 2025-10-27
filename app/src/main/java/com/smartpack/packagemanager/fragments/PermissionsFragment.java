@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -76,6 +77,14 @@ public class PermissionsFragment extends Fragment {
         PermissionsAdapter mRecycleViewAdapter = new PermissionsAdapter(mAPKParser.getPermissions()
                 != null ? getPermissions(requireActivity()) : PackageDetails.getPermissions(mPackageName, requireActivity()), mPackageName, mAPKPicked);
         mRecyclerView.setAdapter(mRecycleViewAdapter);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isAdded()) return;
+                requireActivity().finish();
+            }
+        });
 
         return mRootView;
     }

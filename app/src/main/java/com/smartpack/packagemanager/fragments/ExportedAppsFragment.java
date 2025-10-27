@@ -45,6 +45,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textview.MaterialTextView;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.adapters.ExportedAppsAdapter;
+import com.smartpack.packagemanager.utils.AppSettings;
 import com.smartpack.packagemanager.utils.Downloads;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.Utils;
@@ -237,7 +238,7 @@ public class ExportedAppsFragment extends Fragment {
                     return;
                 }
 
-                Utils.navigateToFragment(requireActivity(), 0);
+                AppSettings.navigateToFragment(requireActivity(), 0);
             }
         });
 
