@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -117,7 +118,36 @@ public class SettingsFragment extends Fragment {
             } else if (position == 1) {
                 AppSettings.setLanguage(requireActivity());
             } else if (position == 2) {
-                sThemeUtils.setAppTheme(requireActivity());
+                new sSingleChoiceDialog(R.drawable.ic_theme, getString(R.string.app_theme),
+                        new String[] {
+                                getString(R.string.app_theme_auto),
+                                getString(R.string.app_theme_dark),
+                                getString(R.string.app_theme_light)
+                        }, sCommonUtils.getInt("appTheme", 0, requireActivity()), requireActivity()) {
+
+                    @Override
+                    public void onItemSelected(int selectedPosition) {
+                        if (selectedPosition == sCommonUtils.getInt("appTheme", 0, requireActivity())) {
+                            return;
+                        }
+                        switch (selectedPosition) {
+                            case 2:
+                                sCommonUtils.saveInt("appTheme", 2, requireActivity());
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                                break;
+                            case 1:
+                                sCommonUtils.saveInt("appTheme", 1, requireActivity());
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                                break;
+                            default:
+                                sCommonUtils.saveInt("appTheme", 0, requireActivity());
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                                break;
+                        }
+                        mData.get(position).setDescription(sThemeUtils.getAppTheme(requireActivity()));
+                        mRecycleViewAdapter.notifyItemChanged(position);
+                    }
+                }.show();
             } else if (position == 4) {
                 new sSingleChoiceDialog(R.drawable.ic_pencil, getString(R.string.exported_apps_name),
                         AppSettings.getAPKNameOptionsMenu(requireActivity()), AppSettings.getAPKNameOptionsPosition(requireActivity()), requireActivity()) {
@@ -128,20 +158,16 @@ public class SettingsFragment extends Fragment {
                             case 0:
                                 if (!sCommonUtils.getString("exportedAPKName", getString(R.string.package_id), requireActivity()).equals(getString(R.string.package_id))) {
                                     sCommonUtils.saveString("exportedAPKName", getString(R.string.package_id), requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.exported_apps_name), getString(R.string.package_id),
-                                            sCommonUtils.getDrawable(R.drawable.ic_pencil, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                             case 1:
                                 if (!sCommonUtils.getString("exportedAPKName", getString(R.string.package_id), requireActivity()).equals(getString(R.string.name))) {
                                     sCommonUtils.saveString("exportedAPKName", getString(R.string.name), requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.exported_apps_name), getString(R.string.name),
-                                            sCommonUtils.getDrawable(R.drawable.ic_pencil, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                         }
+                        mData.get(position).setDescription(AppSettings.getExportedAPKName(requireActivity()));
+                        mRecycleViewAdapter.notifyItemChanged(position);
                     }
                 }.show();
             } else if (position == 5) {
@@ -154,20 +180,16 @@ public class SettingsFragment extends Fragment {
                             case 0:
                                 if (sCommonUtils.getBoolean("neverShow", false, requireActivity())) {
                                     sCommonUtils.saveBoolean("neverShow", false, requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.installer_clicking), getString(R.string.installer_instructions),
-                                            sCommonUtils.getDrawable(R.drawable.ic_install, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                             case 1:
                                 if (!sCommonUtils.getBoolean("neverShow", false, requireActivity())) {
                                     sCommonUtils.saveBoolean("neverShow", true, requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.installer_clicking), getString(R.string.installer_file_picker),
-                                            sCommonUtils.getDrawable(R.drawable.ic_install, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                         }
+                        mData.get(position).setDescription(AppSettings.getInstallerStatus(requireActivity()));
+                        mRecycleViewAdapter.notifyItemChanged(position);
                     }
                 }.show();
             } else if (position == 6) {
@@ -180,20 +202,16 @@ public class SettingsFragment extends Fragment {
                             case 0:
                                 if (sCommonUtils.getBoolean("exit_confirmation", true, requireActivity())) {
                                     sCommonUtils.saveBoolean("exit_confirmation", false, requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.exiting_app), getString(R.string.exit_simple),
-                                            sCommonUtils.getDrawable(R.drawable.ic_exit, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                             case 1:
                                 if (!sCommonUtils.getBoolean("exit_confirmation", true, requireActivity())) {
                                     sCommonUtils.saveBoolean("exit_confirmation", true, requireActivity());
-                                    mData.set(position, new SettingsItems(getString(R.string.exiting_app), getString(R.string.exit_confirmation),
-                                            sCommonUtils.getDrawable(R.drawable.ic_exit, requireActivity()), null, false, 18));
-                                    mRecycleViewAdapter.notifyItemChanged(position);
                                 }
                                 break;
                         }
+                        mData.get(position).setDescription(AppSettings.getExitingStatus(requireActivity()));
+                        mRecycleViewAdapter.notifyItemChanged(position);
                     }
                 }.show();
             } else if (position == 11) {

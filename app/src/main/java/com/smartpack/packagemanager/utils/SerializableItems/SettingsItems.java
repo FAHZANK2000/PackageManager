@@ -16,7 +16,9 @@ import java.io.Serializable;
  * Created by sunilpaulmathew <sunil.kde@gmail.com> on February 10, 2020
  */
 public class SettingsItems implements Serializable {
-    private final String mTitle, mDescription, mUrl;
+
+    private String mDescription;
+    private final String mTitle, mUrl;
     private final Drawable mIcon;
     private final boolean mSectionHeading;
     private final int mSize;
@@ -52,6 +54,10 @@ public class SettingsItems implements Serializable {
 
     public int getSize() {
         return mSize;
+    }
+
+    public void setDescription(String description) {
+        this.mDescription = description;
     }
 
 }
