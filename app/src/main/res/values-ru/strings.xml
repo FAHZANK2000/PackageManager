@@ -58,10 +58,7 @@
     <string name="uninstall_nope">"Сожалею! Вы не можете сделать это отсюда!"</string>
     <string name="uninstall_summary">"Удаление %s"</string>
     <string name="uninstall_title">"Вы уверены, что хотите удалить %s?"</string>
-    <string name="uninstall_warning">"Обратите внимание: удаление системных приложений будет иногда опасно!
-
-        *** <b>ИСПОЛЬЗУЙТЕ НА СВОЙ РИСК</b> ***
-        "</string>
+    <string name="uninstall_warning">"Обратите внимание: удаление системных приложений будет иногда опасно!\n\n*** <b>ИСПОЛЬЗУЙТЕ НА СВОЙ РИСК</b> ***"</string>
     <string name="welcome_message">"Добро пожаловать в Package Manager, простое, но мощное приложение для управления вашими приложениями."</string>
     <string name="wrong_extension">"Пожалуйста, выберите файл с %s расширением."</string>
     <string name="yes">"Да"</string>
@@ -146,4 +143,36 @@
     <string name="user_interface">"Пользовательский интерфейс"</string>
     <string name="uninstall_updates_message">"Однако установлено локальное обновление «%s», которое можно свободно удалить, нажав кнопку «Удалить»."</string>
     <string name="close">"Закрыть"</string>
+    <string name="preparing_message">"подготовка…"</string>
+    <string name="android_version">"Андроид %s"</string>
+    <string name="sdk_compile">"Компиляция SDK: %s"</string>
+    <string name="sdk_minimum">"Минимальный пакет SDK: %s"</string>
+    <string name="update">"Обновить"</string>
+    <string name="disable_failed_message">"Не удалось изменить состояние компонента %s"</string>
+    <string name="never_show">"не показывать снова"</string>
+    <string name="request">"Запрос"</string>
+    <string name="shizuku_integration_message">"Менеджер пакетов теперь может интегрироваться с Shizuku API для выполнения сложных задач. Если вы хотите продолжить интеграцию с Shizuku, пожалуйста, предоставьте разрешение (одноразовое), нажав на кнопку ниже."</string>
+    <string name="feature_unavailable_message">"Для использования этой функции требуется Root или Shizuku"</string>
+    <string name="failed_decode_xml">"Не удалось декодировать %s"</string>
+    <string name="batch_processing_failed_title">"Выбранный процесс провален"</string>
+    <string name="batch_processing_success_message">"Выбранный процесс успешно завершён…"</string>
+    <string name="delete_selected">"Удалить выбранный"</string>
+    <string name="exploring">"Проверка"</string>
+    <string name="export_details_selected_question">"Экспортировать данные из выбранных приложений?"</string>
+    <string name="export_message_summary">"Выбранные приложения экспортированны на '%s'"</string>
+    <string name="export_selected">"выбрать экспорт"</string>
+    <string name="export_selected_question">"Экспортировать выбранные приложения?"</string>
+    <string name="export_success_message">"Выбранные элементы были экспортированы по пути: %s"</string>
+    <string name="ignored">"Игнорировать"</string>
+    <string name="permission_granted_write_storage">"Доступ к хранилищу предоставлен!  Нажмите кнопку ещё раз, чтобы начать."</string>
+    <string name="purchase_pro">"Купить Pro"</string>
+    <string name="purchase_pro_acknowledgement">"Спасибо \u2665 Вы уже поддерживаете нас, используя версию Pro."</string>
+    <string name="reset_selected_question">"Сбросить выбранные приложения?"</string>
+    <string name="restore_selected">"Восстановить выбранные"</string>
+    <string name="status">"Статус: %s"</string>
+    <string name="turn_on_off_selected_question">"Включить/выключить выбранные приложения?"</string>
+    <string name="uninstall_selected_question">"Удалить выбранные приложения?"</string>
+    <string name="applications">"Приложения"</string>
+    <string name="split_apk_list_empty">"Разделенные APK-файлы не выбраны. Пауза…"</string>
+    <string name="split_apk_select">"Выберите разделённые APK-файлы для установки"</string>
 </resources>
