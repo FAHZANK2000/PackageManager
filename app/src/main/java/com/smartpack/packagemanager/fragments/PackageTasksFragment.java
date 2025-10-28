@@ -48,10 +48,12 @@ import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.adapters.PackageTasksAdapter;
 import com.smartpack.packagemanager.dialogs.BatchOptionsDialog;
 import com.smartpack.packagemanager.dialogs.BatchResultsDialog;
+import com.smartpack.packagemanager.dialogs.BottomMenuDialog;
 import com.smartpack.packagemanager.dialogs.ProgressDialog;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.PackageDetails;
 import com.smartpack.packagemanager.utils.SerializableItems.BatchOptionsItems;
+import com.smartpack.packagemanager.utils.SerializableItems.MenuItems;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageItems;
 import com.smartpack.packagemanager.utils.RootShell;
 import com.smartpack.packagemanager.utils.ShizukuShell;
@@ -411,121 +413,40 @@ public class PackageTasksFragment extends Fragment {
 
     @SuppressLint("StringFormatInvalid")
     private void batchOptionsMenu(Activity activity) {
-        PopupMenu popupMenu = new PopupMenu(activity, mBatchOptions);
-        Menu menu = popupMenu.getMenu();
+        List<MenuItems> menuItems = new ArrayList<>();
         if (mRootShell.rootAccess() || mShizukuShell.isReady()) {
-            menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.turn_on_off));
+            menuItems.add(new MenuItems(getString(R.string.turn_on_off), null, 0));
         }
-        menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.uninstall));
+        menuItems.add(new MenuItems(getString(R.string.uninstall), null, 1));
         if (mRootShell.rootAccess() || mShizukuShell.isReady()) {
-            menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.reset));
+            menuItems.add(new MenuItems(getString(R.string.reset), null, 2));
         }
-        menu.add(Menu.NONE, 3, Menu.NONE, getString(R.string.export));
-        menu.add(Menu.NONE, 4, Menu.NONE, getString(R.string.export_details));
-        menu.add(Menu.NONE, 5, Menu.NONE, getString(R.string.select_all)).setCheckable(true)
-                .setChecked(mData.size() == mBatchList.size());
+        menuItems.add(new MenuItems(getString(R.string.export), null, 3));
+        menuItems.add(new MenuItems(getString(R.string.export_details), null, 4));
         if (mData.size() != mBatchList.size()) {
-            menu.add(Menu.NONE, 6, Menu.NONE, getString(R.string.batch_list_clear));
+            menuItems.add(new MenuItems(getString(R.string.select_all), null, 5));
         }
-        popupMenu.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case 0:
-                    new BatchOptionsDialog(getString(R.string.turn_on_off_selected_question), getString(R.string.turn_on_off), mBatchList, requireActivity()) {
-                        @Override
-                        public void apply(List<BatchOptionsItems> data) {
-                            new sExecutor() {
-                                private boolean mEmpty = true;
-                                private final List<BatchOptionsItems> newData = new CopyOnWriteArrayList<>();
-                                private ProgressDialog mProgressDialog;
-                                @Override
-                                public void onPreExecute() {
-                                    mProgressDialog = new ProgressDialog(activity);
-                                    mProgressDialog.setIcon(R.mipmap.ic_launcher);
-                                    mProgressDialog.setTitle(getString(R.string.disabling, "..."));
-                                    mProgressDialog.show();
+        if (!mBatchList.isEmpty()) {
+            menuItems.add(new MenuItems(getString(R.string.batch_list_clear), null, 6));
+        }
 
-                                    if (mRootShell == null) {
-                                        mRootShell = new RootShell();
-                                    }
-                                    if (mShizukuShell == null) {
-                                        mShizukuShell = new ShizukuShell();
-                                    }
-                                }
-
-                                @Override
-                                public void doInBackground() {
-                                    mProgressDialog.setMax(data.size());
-                                    for (BatchOptionsItems batchOptionsItems : data) {
-                                        if (batchOptionsItems.isChecked()) {
-                                            if (batchOptionsItems.getPackageName().equals(activity.getPackageName())) {
-                                                newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
-                                            } else {
-                                                String result;
-                                                if (mRootShell.rootAccess()) {
-                                                    result = mRootShell.runAndGetError((sPackageUtils.isEnabled(batchOptionsItems.getPackageName(), activity) ? "pm disable " : "pm enable ") + batchOptionsItems.getPackageName());
-                                                } else {
-                                                    result = mShizukuShell.runAndGetOutput((sPackageUtils.isEnabled(batchOptionsItems.getPackageName(), activity) ? "pm disable " : "pm enable ") + batchOptionsItems.getPackageName());
-                                                }
-                                                if (result != null && (!result.contains("new state: disabled") && !result.contains("new state: enabled"))) {
-                                                    newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
-                                                }
-                                                for (int i = 0; i < PackageData.getRawData().size(); i++) {
-                                                    if (PackageData.getRawData().get(i).getPackageName().equals(batchOptionsItems.getPackageName())) {
-                                                        PackageItems itemOld = PackageData.getRawData().get(i);
-                                                        PackageItems itemNew = new PackageItems(
-                                                                itemOld.getPackageName(),
-                                                                sPackageUtils.getAppName(batchOptionsItems.getPackageName(), requireActivity()).toString(),
-                                                                itemOld.getSourceDir(),
-                                                                itemOld.isRemoved(),
-                                                                requireActivity()
-                                                        );
-                                                        PackageData.getRawData().set(i, itemNew);
-                                                        int index = mData.indexOf(itemOld);
-                                                        if (index != -1) {
-                                                            mData.set(index, itemNew);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            mEmpty = false;
-                                        }
-                                        mProgressDialog.updateProgress(1);
-                                    }
-                                }
-
-                                @Override
-                                public void onPostExecute() {
-                                    if (mProgressDialog.isShowing()) {
-                                        mProgressDialog.dismiss();
-                                    }
-                                    if (!mEmpty) {
-                                        mRecycleViewAdapter.notifyItemRangeChanged(0, mRecycleViewAdapter.getItemCount());
-                                        if (!newData.isEmpty()) {
-                                            new BatchResultsDialog(newData, activity);
-                                        } else {
-                                            sCommonUtils.toast(R.string.batch_processing_success_message, activity).show();
-                                        }
-                                    }
-                                }
-                            }.execute();
-                        }
-                    };
-                    break;
-                case 1:
-                    if (mRootShell.rootAccess() || mShizukuShell.isReady()) {
-                        new BatchOptionsDialog(getString(R.string.uninstall_selected_question), getString(R.string.uninstall), mBatchList, requireActivity()) {
+        new BottomMenuDialog(menuItems, sCommonUtils.getDrawable(R.mipmap.ic_launcher, activity), null, getString(R.string.app_name), getString(R.string.batch_options, mBatchList.size()), activity) {
+            @Override
+            public void onMenuItemClicked(int menuID) {
+                switch (menuID) {
+                    case 0:
+                        new BatchOptionsDialog(getString(R.string.turn_on_off_selected_question), getString(R.string.turn_on_off), mBatchList, requireActivity()) {
                             @Override
                             public void apply(List<BatchOptionsItems> data) {
                                 new sExecutor() {
                                     private boolean mEmpty = true;
-                                    private final List<Integer> mPositionsRemoved = new CopyOnWriteArrayList<>();
-                                    private final List<BatchOptionsItems> mNewData = new CopyOnWriteArrayList<>();
+                                    private final List<BatchOptionsItems> newData = new CopyOnWriteArrayList<>();
                                     private ProgressDialog mProgressDialog;
                                     @Override
                                     public void onPreExecute() {
                                         mProgressDialog = new ProgressDialog(activity);
                                         mProgressDialog.setIcon(R.mipmap.ic_launcher);
-                                        mProgressDialog.setTitle(getString(R.string.uninstall_summary, "..."));
+                                        mProgressDialog.setTitle(getString(R.string.disabling, "..."));
                                         mProgressDialog.show();
 
                                         if (mRootShell == null) {
@@ -542,32 +463,33 @@ public class PackageTasksFragment extends Fragment {
                                         for (BatchOptionsItems batchOptionsItems : data) {
                                             if (batchOptionsItems.isChecked()) {
                                                 if (batchOptionsItems.getPackageName().equals(activity.getPackageName())) {
-                                                    mNewData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
+                                                    newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
                                                 } else {
                                                     String result;
-                                                    String cmd = "pm uninstall --user " + Utils.getUserID() + " " + batchOptionsItems.getPackageName();
                                                     if (mRootShell.rootAccess()) {
-                                                        result = mRootShell.runAndGetError(cmd);
+                                                        result = mRootShell.runAndGetError((sPackageUtils.isEnabled(batchOptionsItems.getPackageName(), activity) ? "pm disable " : "pm enable ") + batchOptionsItems.getPackageName());
                                                     } else {
-                                                        result = mShizukuShell.runAndGetOutput(cmd);
+                                                        result = mShizukuShell.runAndGetOutput((sPackageUtils.isEnabled(batchOptionsItems.getPackageName(), activity) ? "pm disable " : "pm enable ") + batchOptionsItems.getPackageName());
                                                     }
-                                                    if (result != null && result.trim().equals("Success")) {
-                                                        for (int i = 0; i < PackageData.getRawData().size(); i++) {
-                                                            if (PackageData.getRawData().get(i).getPackageName().equals(batchOptionsItems.getPackageName())) {
-                                                                PackageItems packageItems = PackageData.getRawData().get(i);
-                                                                PackageData.getRawData().remove(packageItems);
-                                                                if (!packageItems.isUserApp()) {
-                                                                    PackageData.getRemovedPackagesData().add(new PackageItems(packageItems.getPackageName(), packageItems.getAppName(), packageItems.getSourceDir(), true, activity));
-                                                                }
-                                                                int index = mData.indexOf(packageItems);
-                                                                if (index != -1) {
-                                                                    mData.remove(packageItems);
-                                                                    mPositionsRemoved.add(index);
-                                                                }
+                                                    if (result != null && (!result.contains("new state: disabled") && !result.contains("new state: enabled"))) {
+                                                        newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
+                                                    }
+                                                    for (int i = 0; i < PackageData.getRawData().size(); i++) {
+                                                        if (PackageData.getRawData().get(i).getPackageName().equals(batchOptionsItems.getPackageName())) {
+                                                            PackageItems itemOld = PackageData.getRawData().get(i);
+                                                            PackageItems itemNew = new PackageItems(
+                                                                    itemOld.getPackageName(),
+                                                                    sPackageUtils.getAppName(batchOptionsItems.getPackageName(), requireActivity()).toString(),
+                                                                    itemOld.getSourceDir(),
+                                                                    itemOld.isRemoved(),
+                                                                    requireActivity()
+                                                            );
+                                                            PackageData.getRawData().set(i, itemNew);
+                                                            int index = mData.indexOf(itemOld);
+                                                            if (index != -1) {
+                                                                mData.set(index, itemNew);
                                                             }
                                                         }
-                                                    } else {
-                                                        mNewData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
                                                     }
                                                 }
                                                 mEmpty = false;
@@ -582,14 +504,9 @@ public class PackageTasksFragment extends Fragment {
                                             mProgressDialog.dismiss();
                                         }
                                         if (!mEmpty) {
-                                            for (Integer positions : mPositionsRemoved) {
-                                                mRecycleViewAdapter.notifyItemRemoved(positions);
-                                            }
                                             mRecycleViewAdapter.notifyItemRangeChanged(0, mRecycleViewAdapter.getItemCount());
-                                            mBatchList.clear();
-                                            mBatchOptions.setVisibility(GONE);
-                                            if (!mNewData.isEmpty()) {
-                                                new BatchResultsDialog(mNewData, activity);
+                                            if (!newData.isEmpty()) {
+                                                new BatchResultsDialog(newData, activity);
                                             } else {
                                                 sCommonUtils.toast(R.string.batch_processing_success_message, activity).show();
                                             }
@@ -599,111 +516,135 @@ public class PackageTasksFragment extends Fragment {
                             }
                         };
                         break;
-                    } else {
-                        uninstallUserApp(mBatchList.get(0));
-                    }
-                    break;
-                case 2:
-                    new BatchOptionsDialog(getString(R.string.reset_selected_question), getString(R.string.reset), mBatchList, requireActivity()) {
-                        @Override
-                        public void apply(List<BatchOptionsItems> data) {
-                            new sExecutor() {
-                                private boolean mEmpty = true;
-                                private final List<BatchOptionsItems> newData = new CopyOnWriteArrayList<>();
-                                private ProgressDialog mProgressDialog;
+                    case 1:
+                        if (mRootShell.rootAccess() || mShizukuShell.isReady()) {
+                            new BatchOptionsDialog(getString(R.string.uninstall_selected_question), getString(R.string.uninstall), mBatchList, requireActivity()) {
                                 @Override
-                                public void onPreExecute() {
-                                    mProgressDialog = new ProgressDialog(activity);
-                                    mProgressDialog.setIcon(R.mipmap.ic_launcher);
-                                    mProgressDialog.setTitle(getString(R.string.reset_summary, "..."));
-                                    mProgressDialog.show();
+                                public void apply(List<BatchOptionsItems> data) {
+                                    new sExecutor() {
+                                        private boolean mEmpty = true;
+                                        private final List<Integer> mPositionsRemoved = new CopyOnWriteArrayList<>();
+                                        private final List<BatchOptionsItems> mNewData = new CopyOnWriteArrayList<>();
+                                        private ProgressDialog mProgressDialog;
+                                        @Override
+                                        public void onPreExecute() {
+                                            mProgressDialog = new ProgressDialog(activity);
+                                            mProgressDialog.setIcon(R.mipmap.ic_launcher);
+                                            mProgressDialog.setTitle(getString(R.string.uninstall_summary, "..."));
+                                            mProgressDialog.show();
 
-                                    if (mRootShell == null) {
-                                        mRootShell = new RootShell();
-                                    }
-                                    if (mShizukuShell == null) {
-                                        mShizukuShell = new ShizukuShell();
-                                    }
-                                }
-
-                                @Override
-                                public void doInBackground() {
-                                    mProgressDialog.setMax(data.size());
-                                    for (BatchOptionsItems batchOptionsItems : data) {
-                                        if (batchOptionsItems.isChecked()) {
-                                            if (batchOptionsItems.getPackageName().equals(activity.getPackageName())) {
-                                                newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
-                                            } else {
-                                                if (mRootShell.rootAccess()) {
-                                                    mRootShell.runCommand("pm clear " + batchOptionsItems.getPackageName());
-                                                } else {
-                                                    mShizukuShell.runCommand("pm clear " + batchOptionsItems.getPackageName());
-                                                }
-                                                newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
+                                            if (mRootShell == null) {
+                                                mRootShell = new RootShell();
                                             }
-                                            mEmpty = false;
+                                            if (mShizukuShell == null) {
+                                                mShizukuShell = new ShizukuShell();
+                                            }
                                         }
-                                        mProgressDialog.updateProgress(1);
-                                    }
-                                }
 
-                                @Override
-                                public void onPostExecute() {
-                                    if (mProgressDialog.isShowing()) {
-                                        mProgressDialog.dismiss();
-                                    }
-                                    if (!mEmpty) {
-                                        if (newData.isEmpty()) {
-                                            sCommonUtils.toast(R.string.batch_processing_success_message, activity).show();
-                                        } else {
-                                            new BatchResultsDialog(newData, activity);
+                                        @Override
+                                        public void doInBackground() {
+                                            mProgressDialog.setMax(data.size());
+                                            for (BatchOptionsItems batchOptionsItems : data) {
+                                                if (batchOptionsItems.isChecked()) {
+                                                    if (batchOptionsItems.getPackageName().equals(activity.getPackageName())) {
+                                                        mNewData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
+                                                    } else {
+                                                        String result;
+                                                        String cmd = "pm uninstall --user " + Utils.getUserID() + " " + batchOptionsItems.getPackageName();
+                                                        if (mRootShell.rootAccess()) {
+                                                            result = mRootShell.runAndGetError(cmd);
+                                                        } else {
+                                                            result = mShizukuShell.runAndGetOutput(cmd);
+                                                        }
+                                                        if (result != null && result.trim().equals("Success")) {
+                                                            for (int i = 0; i < PackageData.getRawData().size(); i++) {
+                                                                if (PackageData.getRawData().get(i).getPackageName().equals(batchOptionsItems.getPackageName())) {
+                                                                    PackageItems packageItems = PackageData.getRawData().get(i);
+                                                                    PackageData.getRawData().remove(packageItems);
+                                                                    if (!packageItems.isUserApp()) {
+                                                                        PackageData.getRemovedPackagesData().add(new PackageItems(packageItems.getPackageName(), packageItems.getAppName(), packageItems.getSourceDir(), true, activity));
+                                                                    }
+                                                                    int index = mData.indexOf(packageItems);
+                                                                    if (index != -1) {
+                                                                        mData.remove(packageItems);
+                                                                        mPositionsRemoved.add(index);
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else {
+                                                            mNewData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
+                                                        }
+                                                    }
+                                                    mEmpty = false;
+                                                }
+                                                mProgressDialog.updateProgress(1);
+                                            }
                                         }
-                                    }
+
+                                        @Override
+                                        public void onPostExecute() {
+                                            if (mProgressDialog.isShowing()) {
+                                                mProgressDialog.dismiss();
+                                            }
+                                            if (!mEmpty) {
+                                                for (Integer positions : mPositionsRemoved) {
+                                                    mRecycleViewAdapter.notifyItemRemoved(positions);
+                                                }
+                                                mRecycleViewAdapter.notifyItemRangeChanged(0, mRecycleViewAdapter.getItemCount());
+                                                mBatchList.clear();
+                                                mBatchOptions.setVisibility(GONE);
+                                                if (!mNewData.isEmpty()) {
+                                                    new BatchResultsDialog(mNewData, activity);
+                                                } else {
+                                                    sCommonUtils.toast(R.string.batch_processing_success_message, activity).show();
+                                                }
+                                            }
+                                        }
+                                    }.execute();
                                 }
-                            }.execute();
+                            };
+                            break;
+                        } else {
+                            uninstallUserApp(mBatchList.get(0));
                         }
-                    };
-                    break;
-                case 3:
-                    if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE, activity)) {
-                        sPermissionUtils.requestPermission(new String[]{
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                activity);
-                        sCommonUtils.toast(activity.getString(R.string.permission_denied_write_storage), requireActivity()).show();
-                    } else {
-                        new BatchOptionsDialog(getString(R.string.export_selected_question), getString(R.string.export), mBatchList, requireActivity()) {
+                        break;
+                    case 2:
+                        new BatchOptionsDialog(getString(R.string.reset_selected_question), getString(R.string.reset), mBatchList, requireActivity()) {
                             @Override
                             public void apply(List<BatchOptionsItems> data) {
                                 new sExecutor() {
                                     private boolean mEmpty = true;
+                                    private final List<BatchOptionsItems> newData = new CopyOnWriteArrayList<>();
                                     private ProgressDialog mProgressDialog;
                                     @Override
                                     public void onPreExecute() {
                                         mProgressDialog = new ProgressDialog(activity);
                                         mProgressDialog.setIcon(R.mipmap.ic_launcher);
-                                        mProgressDialog.setTitle(activity.getString(R.string.exporting, "..."));
+                                        mProgressDialog.setTitle(getString(R.string.reset_summary, "..."));
                                         mProgressDialog.show();
+
+                                        if (mRootShell == null) {
+                                            mRootShell = new RootShell();
+                                        }
+                                        if (mShizukuShell == null) {
+                                            mShizukuShell = new ShizukuShell();
+                                        }
                                     }
 
                                     @Override
                                     public void doInBackground() {
-                                        PackageData.makePackageFolder(activity);
                                         mProgressDialog.setMax(data.size());
                                         for (BatchOptionsItems batchOptionsItems : data) {
                                             if (batchOptionsItems.isChecked()) {
-                                                if (SplitAPKInstaller.isAppBundle(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity))) {
-                                                    List<File> mFiles = new ArrayList<>();
-                                                    for (final String splitApps : SplitAPKInstaller.splitApks(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity))) {
-                                                        mFiles.add(new File(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity) + "/" + splitApps));
-                                                    }
-                                                    try (ZipFileUtils zipFileUtils = new ZipFileUtils(PackageData.getPackageDir(activity) + "/" + PackageData.getFileName(batchOptionsItems.getPackageName(), activity) + "_" +
-                                                            sAPKUtils.getVersionCode(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity), activity) + ".apkm")) {
-                                                        zipFileUtils.zip(mFiles);
-                                                    } catch (IOException ignored) {
-                                                    }
+                                                if (batchOptionsItems.getPackageName().equals(activity.getPackageName())) {
+                                                    newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 0));
                                                 } else {
-                                                    sFileUtils.copy(new File(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity)), new File(PackageData.getPackageDir(activity), PackageData.getFileName(batchOptionsItems.getPackageName(), activity) + "_" +
-                                                            sAPKUtils.getVersionCode(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity), activity) + ".apk"));
+                                                    if (mRootShell.rootAccess()) {
+                                                        mRootShell.runCommand("pm clear " + batchOptionsItems.getPackageName());
+                                                    } else {
+                                                        mShizukuShell.runCommand("pm clear " + batchOptionsItems.getPackageName());
+                                                    }
+                                                    newData.add(new BatchOptionsItems(batchOptionsItems.getName(), batchOptionsItems.getPackageName(), batchOptionsItems.getIcon(), false, 1));
                                                 }
                                                 mEmpty = false;
                                             }
@@ -717,99 +658,162 @@ public class PackageTasksFragment extends Fragment {
                                             mProgressDialog.dismiss();
                                         }
                                         if (!mEmpty) {
-                                            new MaterialAlertDialogBuilder(activity)
-                                                    .setIcon(R.mipmap.ic_launcher)
-                                                    .setTitle(R.string.app_name)
-                                                    .setMessage(getString(R.string.export_message_summary, PackageData.getPackageDir(activity)))
-                                                    .setPositiveButton(R.string.cancel, (dialog, id) -> {
-                                                    }).show();
-                                        }
-                                    }
-                                }.execute();
-                            }
-                        };
-                    }
-                    break;
-                case 4:
-                    if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE, requireActivity())) {
-                        sPermissionUtils.requestPermission(new String[]{
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                activity);
-                        sCommonUtils.toast(getString(R.string.permission_denied_write_storage), activity).show();
-                    } else {
-                        new BatchOptionsDialog(getString(R.string.export_details_selected_question), getString(R.string.export), mBatchList, requireActivity()) {
-                            @Override
-                            public void apply(List<BatchOptionsItems> data) {
-                                new sExecutor() {
-                                    private boolean mEmpty = true;
-                                    private File mJSON;
-                                    private ProgressDialog mProgressDialog;
-                                    @Override
-                                    public void onPreExecute() {
-                                        mProgressDialog = new ProgressDialog(activity);
-                                        mProgressDialog.setIcon(R.mipmap.ic_launcher);
-                                        mProgressDialog.setTitle(activity.getString(R.string.exporting, "..."));
-                                        mProgressDialog.show();
-                                    }
-
-                                    @Override
-                                    public void doInBackground() {
-                                        PackageData.makePackageFolder(activity);
-                                        mProgressDialog.setMax(data.size());
-                                        mJSON = new File(PackageData.getPackageDir(activity), "package_details" + System.currentTimeMillis() + " .json");
-                                        JSONObject obj = new JSONObject();
-                                        JSONArray apps = new JSONArray();
-                                        for (BatchOptionsItems batchOptionsItems : data) {
-                                            if (batchOptionsItems.isChecked() && sPackageUtils.isPackageInstalled(batchOptionsItems.getPackageName(), activity)) {
-                                                try {
-                                                    apps.put(PackageDetails.getPackageDetails(batchOptionsItems.getPackageName(), activity));
-                                                    obj.put("applications", apps);
-                                                } catch (JSONException ignored) {
-                                                }
-                                                mEmpty = false;
+                                            if (newData.isEmpty()) {
+                                                sCommonUtils.toast(R.string.batch_processing_success_message, activity).show();
+                                            } else {
+                                                new BatchResultsDialog(newData, activity);
                                             }
-                                            mProgressDialog.updateProgress(1);
-                                        }
-                                        sFileUtils.create(obj.toString(), mJSON);
-                                    }
-
-                                    @Override
-                                    public void onPostExecute() {
-                                        mProgressDialog.dismiss();
-
-                                        if (!mEmpty) {
-                                            new MaterialAlertDialogBuilder(requireActivity())
-                                                    .setIcon(R.mipmap.ic_launcher)
-                                                    .setTitle(R.string.app_name)
-                                                    .setMessage(getString(R.string.export_details_message, mJSON.getAbsolutePath()))
-                                                    .setPositiveButton(R.string.cancel, (dialog, i) -> {
-                                                    }).show();
                                         }
                                     }
                                 }.execute();
                             }
                         };
-                    }
-                    break;
-                case 5:
-                    if (mData.size() != mBatchList.size()) {
-                        mBatchList.clear();
-                        for (PackageItems mPackage : mData) {
-                            mBatchList.add(mPackage.getPackageName());
+                        break;
+                    case 3:
+                        if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE, activity)) {
+                            sPermissionUtils.requestPermission(new String[]{
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    activity);
+                            sCommonUtils.toast(activity.getString(R.string.permission_denied_write_storage), requireActivity()).show();
+                        } else {
+                            new BatchOptionsDialog(getString(R.string.export_selected_question), getString(R.string.export), mBatchList, requireActivity()) {
+                                @Override
+                                public void apply(List<BatchOptionsItems> data) {
+                                    new sExecutor() {
+                                        private boolean mEmpty = true;
+                                        private ProgressDialog mProgressDialog;
+                                        @Override
+                                        public void onPreExecute() {
+                                            mProgressDialog = new ProgressDialog(activity);
+                                            mProgressDialog.setIcon(R.mipmap.ic_launcher);
+                                            mProgressDialog.setTitle(activity.getString(R.string.exporting, "..."));
+                                            mProgressDialog.show();
+                                        }
+
+                                        @Override
+                                        public void doInBackground() {
+                                            PackageData.makePackageFolder(activity);
+                                            mProgressDialog.setMax(data.size());
+                                            for (BatchOptionsItems batchOptionsItems : data) {
+                                                if (batchOptionsItems.isChecked()) {
+                                                    if (SplitAPKInstaller.isAppBundle(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity))) {
+                                                        List<File> mFiles = new ArrayList<>();
+                                                        for (final String splitApps : SplitAPKInstaller.splitApks(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity))) {
+                                                            mFiles.add(new File(sPackageUtils.getParentDir(batchOptionsItems.getPackageName(), activity) + "/" + splitApps));
+                                                        }
+                                                        try (ZipFileUtils zipFileUtils = new ZipFileUtils(PackageData.getPackageDir(activity) + "/" + PackageData.getFileName(batchOptionsItems.getPackageName(), activity) + "_" +
+                                                                sAPKUtils.getVersionCode(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity), activity) + ".apkm")) {
+                                                            zipFileUtils.zip(mFiles);
+                                                        } catch (IOException ignored) {
+                                                        }
+                                                    } else {
+                                                        sFileUtils.copy(new File(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity)), new File(PackageData.getPackageDir(activity), PackageData.getFileName(batchOptionsItems.getPackageName(), activity) + "_" +
+                                                                sAPKUtils.getVersionCode(sPackageUtils.getSourceDir(batchOptionsItems.getPackageName(), activity), activity) + ".apk"));
+                                                    }
+                                                    mEmpty = false;
+                                                }
+                                                mProgressDialog.updateProgress(1);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onPostExecute() {
+                                            if (mProgressDialog.isShowing()) {
+                                                mProgressDialog.dismiss();
+                                            }
+                                            if (!mEmpty) {
+                                                new MaterialAlertDialogBuilder(activity)
+                                                        .setIcon(R.mipmap.ic_launcher)
+                                                        .setTitle(R.string.app_name)
+                                                        .setMessage(getString(R.string.export_message_summary, PackageData.getPackageDir(activity)))
+                                                        .setPositiveButton(R.string.cancel, (dialog, id) -> {
+                                                        }).show();
+                                            }
+                                        }
+                                    }.execute();
+                                }
+                            };
                         }
-                    } else {
+                        break;
+                    case 4:
+                        if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE, requireActivity())) {
+                            sPermissionUtils.requestPermission(new String[]{
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    activity);
+                            sCommonUtils.toast(getString(R.string.permission_denied_write_storage), activity).show();
+                        } else {
+                            new BatchOptionsDialog(getString(R.string.export_details_selected_question), getString(R.string.export), mBatchList, requireActivity()) {
+                                @Override
+                                public void apply(List<BatchOptionsItems> data) {
+                                    new sExecutor() {
+                                        private boolean mEmpty = true;
+                                        private File mJSON;
+                                        private ProgressDialog mProgressDialog;
+                                        @Override
+                                        public void onPreExecute() {
+                                            mProgressDialog = new ProgressDialog(activity);
+                                            mProgressDialog.setIcon(R.mipmap.ic_launcher);
+                                            mProgressDialog.setTitle(activity.getString(R.string.exporting, "..."));
+                                            mProgressDialog.show();
+                                        }
+
+                                        @Override
+                                        public void doInBackground() {
+                                            PackageData.makePackageFolder(activity);
+                                            mProgressDialog.setMax(data.size());
+                                            mJSON = new File(PackageData.getPackageDir(activity), "package_details" + System.currentTimeMillis() + " .json");
+                                            JSONObject obj = new JSONObject();
+                                            JSONArray apps = new JSONArray();
+                                            for (BatchOptionsItems batchOptionsItems : data) {
+                                                if (batchOptionsItems.isChecked() && sPackageUtils.isPackageInstalled(batchOptionsItems.getPackageName(), activity)) {
+                                                    try {
+                                                        apps.put(PackageDetails.getPackageDetails(batchOptionsItems.getPackageName(), activity));
+                                                        obj.put("applications", apps);
+                                                    } catch (JSONException ignored) {
+                                                    }
+                                                    mEmpty = false;
+                                                }
+                                                mProgressDialog.updateProgress(1);
+                                            }
+                                            sFileUtils.create(obj.toString(), mJSON);
+                                        }
+
+                                        @Override
+                                        public void onPostExecute() {
+                                            mProgressDialog.dismiss();
+
+                                            if (!mEmpty) {
+                                                new MaterialAlertDialogBuilder(requireActivity())
+                                                        .setIcon(R.mipmap.ic_launcher)
+                                                        .setTitle(R.string.app_name)
+                                                        .setMessage(getString(R.string.export_details_message, mJSON.getAbsolutePath()))
+                                                        .setPositiveButton(R.string.cancel, (dialog, i) -> {
+                                                        }).show();
+                                            }
+                                        }
+                                    }.execute();
+                                }
+                            };
+                        }
+                        break;
+                    case 5:
+                        if (mData.size() != mBatchList.size()) {
+                            mBatchList.clear();
+                            for (PackageItems mPackage : mData) {
+                                mBatchList.add(mPackage.getPackageName());
+                            }
+                        } else {
+                            mBatchList.clear();
+                        }
+                        loadUI(mSearchText, activity);
+                        break;
+                    case 6:
                         mBatchList.clear();
-                    }
-                    loadUI(mSearchText, activity);
-                    break;
-                case 6:
-                    mBatchList.clear();
-                    loadUI(mSearchText, activity);
-                    break;
+                        loadUI(mSearchText, activity);
+                        break;
+                }
             }
-            return false;
-        });
-        popupMenu.show();
+        };
     }
 
     private void loadUI(String searchTxt, Activity activity) {

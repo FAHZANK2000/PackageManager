@@ -6,6 +6,18 @@ include_in_footer: true
 
 <h2 style="color: blue">🆕 What's New</h2>
 
+### ✨ 71. [v7.6](https://play.google.com/store/apps/details?id=com.smartpack.packagemanager.pro) *(Oct 28, 2025)*
+- You can now create desktop shortcuts for other apps’ exported activities.
+- Improved Settings screen to better reflect the current status of items after changes.
+- Modernized Package ID and Batch Options menus with a sleek bottom sheet dialog.
+- Enhanced AppOps with more precise control options.
+- Added a smooth loading animation for recycler views.
+- Simplified and cleaned up package list handling, ensuring “Sort by APK size” now works correctly.
+- Improved layout of Activities and Uninstalled Apps views for better readability and usability.
+- Updated APK handling: now shows file name and icon even for uninstalled APKs.
+- Fixed split APK installation failures for .xapk files.
+- Miscellaneous changes.
+
 ### ✨ 70. [v7.5](https://github.com/SmartPack/PackageManager/releases/tag/v7.5) *(Sept 17, 2025)*
 - Further modernized the app UI for a cleaner, more intuitive experience.
 - Improved app startup performance and overall code quality.
