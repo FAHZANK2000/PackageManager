@@ -88,13 +88,13 @@ public class AppOpsAdapter extends RecyclerView.Adapter<AppOpsAdapter.ViewHolder
                             .setPositiveButton(R.string.got_it, (dialog, id) -> sCommonUtils.saveBoolean("firstOpsAttempt", false, v.getContext())).show();
                 } else {
                     List<MenuItems> menuItems = new ArrayList<>();
-                    menuItems.add(new MenuItems(R.string.operations_allow_title, R.string.operations_allow_description, 0));
-                    menuItems.add(new MenuItems(R.string.operations_ignore_title, R.string.operations_ignore_description, 1));
-                    menuItems.add(new MenuItems(R.string.operations_deny_title, R.string.operations_deny_description, 2));
-                    menuItems.add(new MenuItems(R.string.operations_default_title, R.string.operations_default_description, 3));
-                    menuItems.add(new MenuItems(R.string.operations_foreground_title, R.string.operations_foreground_description, 4));
+                    menuItems.add(new MenuItems(v.getContext().getString(R.string.operations_allow_title), v.getContext().getString(R.string.operations_allow_description), 0));
+                    menuItems.add(new MenuItems(v.getContext().getString(R.string.operations_ignore_title), v.getContext().getString(R.string.operations_ignore_description), 1));
+                    menuItems.add(new MenuItems(v.getContext().getString(R.string.operations_deny_title), v.getContext().getString(R.string.operations_deny_description), 2));
+                    menuItems.add(new MenuItems(v.getContext().getString(R.string.operations_default_title), v.getContext().getString(R.string.operations_default_description), 3));
+                    menuItems.add(new MenuItems(v.getContext().getString(R.string.operations_foreground_title), v.getContext().getString(R.string.operations_foreground_description), 4));
 
-                    new BottomMenuDialog(menuItems, sCommonUtils.getDrawable(R.drawable.ic_shield, v.getContext()), data.get(getBindingAdapterPosition()).getDescription(), data.get(getBindingAdapterPosition()).getTitle().toUpperCase(Locale.getDefault()), v.getContext()) {
+                    new BottomMenuDialog(menuItems, sCommonUtils.getDrawable(R.drawable.ic_shield, v.getContext()), data.get(getBindingAdapterPosition()).getDescription(), data.get(getBindingAdapterPosition()).getTitle().toUpperCase(Locale.getDefault()), sPermissionUtils.getDescription(data.get(getBindingAdapterPosition()).getTitle().toUpperCase(Locale.getDefault()), v.getContext()), v.getContext()) {
                         @Override
                         public void onMenuItemClicked(int menuID) {
                             new sExecutor() {

@@ -1,7 +1,5 @@
 package com.smartpack.packagemanager.utils.SerializableItems;
 
-import android.content.Context;
-
 import java.io.Serializable;
 
 /*
@@ -9,12 +7,12 @@ import java.io.Serializable;
  */
 public class MenuItems implements Serializable {
 
-    private final int titleRes, descriptionRes;
+    private final String titleText, descriptionText;
     private final int id;
 
-    public MenuItems(int titleRes, int descriptionRes, int id) {
-        this.titleRes = titleRes;
-        this.descriptionRes = descriptionRes;
+    public MenuItems(String titleText, String descriptionText, int id) {
+        this.titleText = titleText;
+        this.descriptionText = descriptionText;
         this.id = id;
     }
 
@@ -22,12 +20,12 @@ public class MenuItems implements Serializable {
         return id;
     }
 
-    public String getDescription(Context context) {
-        return context.getString(descriptionRes);
+    public String getDescription() {
+        return descriptionText;
     }
 
-    public String getTile(Context context) {
-        return context.getString(titleRes);
+    public String getTile() {
+        return titleText;
     }
 
 }

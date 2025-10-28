@@ -24,7 +24,7 @@ import in.sunilpaulmathew.sCommon.PermissionUtils.sPermissionUtils;
  */
 public abstract class BottomMenuDialog extends BottomSheetDialog {
 
-    public BottomMenuDialog(List<MenuItems> menuItems, Drawable headerIcon, String currentStatus, String headerTitle, Context context) {
+    public BottomMenuDialog(List<MenuItems> menuItems, Drawable headerIcon, String currentStatus, String headerTitle, String headerDescription, Context context) {
         super(context);
 
         View rootView = View.inflate(context, R.layout.layout_bottom_menu, null);
@@ -34,7 +34,7 @@ public abstract class BottomMenuDialog extends BottomSheetDialog {
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
 
         title.setText(headerTitle);
-        description.setText(sPermissionUtils.getDescription(headerTitle, context));
+        description.setText(headerDescription);
         icon.setImageDrawable(headerIcon);
 
         recyclerView.setItemAnimator(null);
@@ -43,7 +43,7 @@ public abstract class BottomMenuDialog extends BottomSheetDialog {
         recyclerView.setAdapter(new BottomMenuAdapter(menuItems, currentStatus, id -> {
             onMenuItemClicked(id);
             dismiss();
-        }));
+        }, currentStatus == null));
         setContentView(rootView);
         show();
     }

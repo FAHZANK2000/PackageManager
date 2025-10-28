@@ -1,5 +1,8 @@
 package com.smartpack.packagemanager.adapters;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +22,16 @@ import com.smartpack.packagemanager.utils.SerializableItems.MenuItems;
  */
 public class BottomMenuAdapter extends RecyclerView.Adapter<BottomMenuAdapter.ViewHolder> {
 
+    private final boolean isMenu;
     private final List<MenuItems> data;
     private final OnItemClickListener listener;
     private final String currentStatus;
 
-    public BottomMenuAdapter(List<MenuItems> items, String currentStatus, OnItemClickListener listener) {
+    public BottomMenuAdapter(List<MenuItems> items, String currentStatus, OnItemClickListener listener, boolean isMenu) {
         this.data = items;
         this.currentStatus = currentStatus;
         this.listener = listener;
+        this.isMenu = isMenu;
     }
 
     @NonNull
@@ -39,13 +44,21 @@ public class BottomMenuAdapter extends RecyclerView.Adapter<BottomMenuAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MenuItems item = this.data.get(position);
-        holder.title.setText(item.getTile(holder.title.getContext()));
-        holder.description.setText(item.getDescription(holder.description.getContext()));
+        holder.title.setText(item.getTile());
+        holder.description.setText(item.getDescription());
 
-        if (currentStatus.contains(data.get(position).getTile(holder.title.getContext()).toLowerCase())) {
-            holder.itemView.setAlpha(1);
+        if (this.data.get(position).getDescription() != null) {
+            holder.description.setVisibility(VISIBLE);
         } else {
-            holder.itemView.setAlpha((float) 0.5);
+            holder.description.setVisibility(GONE);
+        }
+
+        if (!isMenu) {
+            if (currentStatus.contains(data.get(position).getTile().toLowerCase())) {
+                holder.itemView.setAlpha(1);
+            } else {
+                holder.itemView.setAlpha((float) 0.5);
+            }
         }
     }
 

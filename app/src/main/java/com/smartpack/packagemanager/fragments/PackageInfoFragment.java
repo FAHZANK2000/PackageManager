@@ -18,7 +18,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,7 +25,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,8 +35,10 @@ import com.smartpack.packagemanager.BuildConfig;
 import com.smartpack.packagemanager.R;
 import com.smartpack.packagemanager.adapters.PackageInfoAdapter;
 import com.smartpack.packagemanager.adapters.PackageOptionsAdapter;
+import com.smartpack.packagemanager.dialogs.BottomMenuDialog;
 import com.smartpack.packagemanager.utils.PackageData;
 import com.smartpack.packagemanager.utils.PackageDetails;
+import com.smartpack.packagemanager.utils.SerializableItems.MenuItems;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageInfoItems;
 import com.smartpack.packagemanager.utils.SerializableItems.PackageOptionsItems;
 import com.smartpack.packagemanager.utils.RootShell;
@@ -171,51 +171,52 @@ public class PackageInfoFragment extends Fragment {
 
         mPackageInfoAdapter.setOnItemClickListener((position, v) -> {
             if (position == 0) {
-                PopupMenu popupMenu = new PopupMenu(requireActivity(), v);
-                Menu menu = popupMenu.getMenu();
-                menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.search_market_message, getString(R.string.playstore)));
-                menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.search_market_message, getString(R.string.fdroid)));
-                menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.export_details));
-                menu.add(Menu.NONE, 3, Menu.NONE, getString(R.string.share));
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    switch (item.getItemId()) {
-                        case 0:
-                            sCommonUtils.launchUrl("https://play.google.com/store/apps/details?id=" + mPackageName, requireActivity());
-                            break;
-                        case 1:
-                            sCommonUtils.launchUrl("https://f-droid.org/packages/" + mPackageName, requireActivity());
-                            break;
-                        case 2:
-                            if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, requireActivity())) {
-                                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                            } else {
-                                PackageData.makePackageFolder(requireActivity());
-                                File mJSON = new File(PackageData.getPackageDir(requireActivity()), mPackageName + "_" + sAPKUtils.getVersionCode(
-                                        sPackageUtils.getSourceDir(mPackageName, requireActivity()), requireActivity()) + ".json");
-                                sFileUtils.create(Objects.requireNonNull(PackageDetails.getPackageDetails(mPackageName, requireActivity())).toString(), mJSON);
+                List<MenuItems> menuItems = new ArrayList<>();
+                menuItems.add(new MenuItems(v.getContext().getString(R.string.search_market_message, v.getContext().getString(R.string.playstore)), null, 0));
+                menuItems.add(new MenuItems(v.getContext().getString(R.string.search_market_message, v.getContext().getString(R.string.fdroid)), null, 1));
+                menuItems.add(new MenuItems(v.getContext().getString(R.string.export_details), null, 2));
+                menuItems.add(new MenuItems(v.getContext().getString(R.string.share), null, 3));
 
-                                new MaterialAlertDialogBuilder(requireActivity())
-                                        .setIcon(R.mipmap.ic_launcher)
-                                        .setTitle(R.string.app_name)
-                                        .setMessage(getString(R.string.export_details_message, mJSON.getAbsolutePath()))
-                                        .setPositiveButton(R.string.cancel, (dialog, i) -> {
-                                        }).show();
-                            }
-                            break;
-                        case 3:
-                            Intent shareLink = new Intent();
-                            shareLink.setAction(Intent.ACTION_SEND);
-                            shareLink.putExtra(Intent.EXTRA_SUBJECT, mAppName);
-                            shareLink.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=" + mPackageName
-                                    + "\n\n" + getString(R.string.share_message, BuildConfig.VERSION_NAME));
-                            shareLink.setType("text/plain");
-                            Intent shareIntent = Intent.createChooser(shareLink, getString(R.string.share_with));
-                            startActivity(shareIntent);
-                            break;
+                new BottomMenuDialog(menuItems, appIcon, null, mAppName, mPackageName, v.getContext()) {
+                    @Override
+                    public void onMenuItemClicked(int menuID) {
+                        switch (menuID) {
+                            case 0:
+                                sCommonUtils.launchUrl("https://play.google.com/store/apps/details?id=" + mPackageName, requireActivity());
+                                break;
+                            case 1:
+                                sCommonUtils.launchUrl("https://f-droid.org/packages/" + mPackageName, requireActivity());
+                                break;
+                            case 2:
+                                if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, requireActivity())) {
+                                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                                } else {
+                                    PackageData.makePackageFolder(requireActivity());
+                                    File mJSON = new File(PackageData.getPackageDir(requireActivity()), mPackageName + "_" + sAPKUtils.getVersionCode(
+                                            sPackageUtils.getSourceDir(mPackageName, requireActivity()), requireActivity()) + ".json");
+                                    sFileUtils.create(Objects.requireNonNull(PackageDetails.getPackageDetails(mPackageName, requireActivity())).toString(), mJSON);
+
+                                    new MaterialAlertDialogBuilder(requireActivity())
+                                            .setIcon(R.mipmap.ic_launcher)
+                                            .setTitle(R.string.app_name)
+                                            .setMessage(getString(R.string.export_details_message, mJSON.getAbsolutePath()))
+                                            .setPositiveButton(R.string.cancel, (dialog, i) -> {
+                                            }).show();
+                                }
+                                break;
+                            case 3:
+                                Intent shareLink = new Intent();
+                                shareLink.setAction(Intent.ACTION_SEND);
+                                shareLink.putExtra(Intent.EXTRA_SUBJECT, mAppName);
+                                shareLink.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=" + mPackageName
+                                        + "\n\n" + getString(R.string.share_message, BuildConfig.VERSION_NAME));
+                                shareLink.setType("text/plain");
+                                Intent shareIntent = Intent.createChooser(shareLink, getString(R.string.share_with));
+                                startActivity(shareIntent);
+                                break;
+                        }
                     }
-                    return false;
-                });
-                popupMenu.show();
+                };
             } else if (position == 1) {
                 if (Build.VERSION.SDK_INT < 29 && sPermissionUtils.isPermissionDenied(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, requireActivity())) {
                     requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
